@@ -19,4 +19,23 @@
 
 .kanji-character {
   font-family: 'Noto Sans JP', 'Hiragino Sans', '游ゴシック', 'Yu Gothic', sans-serif;
+  line-height: 1.2;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 640px) {
+  .quiz-option {
+    min-height: 3.5rem; /* Ensure good touch target size */
+  }
+  
+  .kanji-character {
+    line-height: 1.1;
+  }
+}
+
+/* Ensure buttons stack properly on mobile */
+@media (max-width: 480px) {
+  .quiz-form .text-center {
+    padding: 0 1rem;
+  }
 }

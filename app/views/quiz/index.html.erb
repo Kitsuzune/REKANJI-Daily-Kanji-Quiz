@@ -1,42 +1,42 @@
-<div class="text-center mb-12">
-  <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Choose Your Practice Mode</h1>
-  <p class="text-xl text-gray-600">Select how you want to practice Japanese kanji</p>
+<div class="text-center mb-8 md:mb-12 px-4">
+  <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4">Choose Your Practice Mode</h1>
+  <p class="text-lg md:text-xl text-gray-600">Select how you want to practice Japanese kanji</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8 md:mb-12 px-4">
   <% @levels.each do |level| %>
     <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <div class="bg-blue-600 text-white text-center py-4">
-        <h4 class="text-2xl font-bold">
-          <span class="inline-flex px-4 py-2 rounded-full text-sm font-medium <%= level == 'N5' ? 'bg-green-500' : level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>">
+      <div class="bg-blue-600 text-white text-center py-3 md:py-4">
+        <h4 class="text-xl md:text-2xl font-bold">
+          <span class="inline-flex px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium <%= level == 'N5' ? 'bg-green-500' : level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>">
             <%= level %>
           </span>
         </h4>
       </div>
-      <div class="p-6 text-center">
-        <div class="text-4xl font-bold text-gray-800 mb-2"><%= @kanji_counts[level] %></div>
-        <p class="text-gray-600 mb-6">kanji available</p>
+      <div class="p-4 md:p-6 text-center">
+        <div class="text-3xl md:text-4xl font-bold text-gray-800 mb-2"><%= @kanji_counts[level] %></div>
+        <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6">kanji available</p>
         
-        <div class="space-y-3">
+        <div class="space-y-2 md:space-y-3">
           <%= link_to "Practice #{level}", quiz_practice_path(level), 
-              class: "w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+              class: "block w-full bg-blue-600 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base" %>
           <%= link_to "Single Mode", quiz_single_path(level), 
-              class: "w-full border border-blue-600 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors font-medium" %>
+              class: "block w-full border border-blue-600 text-blue-600 py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm md:text-base" %>
         </div>
       </div>
     </div>
   <% end %>
 </div>
 
-<div class="max-w-lg mx-auto">
+<div class="max-w-lg mx-auto px-4">
   <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg overflow-hidden">
-    <div class="bg-yellow-500 text-white text-center py-4">
-      <h4 class="text-2xl font-bold">Mixed Practice</h4>
+    <div class="bg-yellow-500 text-white text-center py-3 md:py-4">
+      <h4 class="text-xl md:text-2xl font-bold">Mixed Practice</h4>
     </div>
-    <div class="p-6 text-center">
-      <p class="text-gray-700 mb-6">Challenge yourself with kanji from all levels!</p>
+    <div class="p-4 md:p-6 text-center">
+      <p class="text-sm md:text-base text-gray-700 mb-4 md:mb-6">Challenge yourself with kanji from all levels!</p>
       <%= link_to "Start Mixed Practice", quiz_mixed_path, 
-          class: "w-full bg-yellow-500 text-white py-4 px-6 rounded-lg hover:bg-yellow-600 transition-colors font-bold text-lg" %>
+          class: "block w-full bg-yellow-500 text-white py-3 md:py-4 px-4 md:px-6 rounded-lg hover:bg-yellow-600 transition-colors font-bold text-base md:text-lg" %>
     </div>
   </div>
 </div>
