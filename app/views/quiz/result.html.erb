@@ -1,0 +1,76 @@
+<% if @result %>
+  <!-- Debug info (remove in production) -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm">
+    <strong>Debug:</strong> 
+    Symbol key: <%= @result[:is_correct].inspect %> | 
+    String key: <%= @result["is_correct"].inspect %> | 
+    Helper result: <%= result_is_correct?(@result) %>
+  </div>
+
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="<%= result_is_correct?(@result) ? 'bg-green-600' : 'bg-red-600' %> text-white text-center py-6">
+        <h4 class="text-3xl font-bold">
+          <%= result_is_correct?(@result) ? '🎉 Correct!' : '❌ Incorrect' %>
+        </h4>
+      </div>
+      <div class="p-8">
+        <div class="text-center mb-8">
+          <div class="text-8xl font-bold text-gray-800 mb-6 kanji-character"><%= @result["kanji"] %></div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white border-2 <%= result_is_correct?(@result) ? 'border-green-500' : 'border-red-500' %> rounded-lg p-6">
+              <h6 class="text-lg font-semibold text-gray-700 mb-2">Correct Answer</h6>
+              <p class="text-xl font-bold text-green-600"><%= @result["meaning"] %></p>
+            </div>
+            <div class="bg-white border-2 border-blue-500 rounded-lg p-6">
+              <h6 class="text-lg font-semibold text-gray-700 mb-2">Your Answer</h6>
+              <p class="text-xl font-bold <%= result_is_correct?(@result) ? 'text-green-600' : 'text-red-600' %>">
+                <%= @result["selected"] %>
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <h6 class="text-lg font-semibold text-gray-700 mb-2">Reading</h6>
+            <p class="text-xl text-gray-800"><%= @result["reading"] %></p>
+            <% if @result["level"] %>
+              <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full mt-2 <%= @result["level"] == 'N5' ? 'bg-green-100 text-green-800' : @result["level"] == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                <%= @result["level"] %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="text-center space-x-4">
+          <% if session[:quiz_mode] == 'single' %>
+            <%= link_to "Try Another #{session[:current_level]}", 
+                quiz_single_path(session[:current_level]), 
+                class: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+          <% elsif session[:quiz_mode] == 'mixed' %>
+            <%= link_to "Try Another Mixed", quiz_mixed_path, 
+                class: "bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 transition-colors font-medium" %>
+          <% else %>
+            <%= link_to "Continue Practice", 
+                quiz_practice_path(session[:current_level]), 
+                class: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+          <% end %>
+          
+          <%= link_to "Back to Quiz Menu", quiz_path, 
+              class: "bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors font-medium" %>
+          <%= link_to "Home", root_path, 
+              class: "border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="max-w-2xl mx-auto text-center">
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8">
+      <div class="text-6xl mb-4">⚠️</div>
+      <h4 class="text-2xl font-bold text-yellow-800 mb-4">No Result Available</h4>
+      <p class="text-yellow-700 mb-6">Please complete a quiz first.</p>
+      <%= link_to "Start Quiz", quiz_path, class: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+    </div>
+  </div>
+<% end %>

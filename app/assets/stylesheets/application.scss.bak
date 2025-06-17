@@ -1,0 +1,78 @@
+@import "bootstrap";
+
+/* Custom styles for Kanji Learning App */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.kanji-character {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #2c3e50;
+  text-align: center;
+  margin: 20px 0;
+  font-family: 'Noto Sans CJK JP', 'Hiragino Sans', '游ゴシック', 'Yu Gothic', sans-serif;
+}
+
+.quiz-option {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.quiz-option:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.quiz-option.correct {
+  border-color: #28a745;
+  background-color: #d4edda;
+}
+
+.quiz-option.incorrect {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+}
+
+.level-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 0.25rem;
+}
+
+.level-n5 { background-color: #28a745; color: white; }
+.level-n4 { background-color: #ffc107; color: black; }
+.level-n3 { background-color: #dc3545; color: white; }
+
+.progress-card {
+  border-left: 4px solid #007bff;
+  transition: all 0.3s ease;
+}
+
+.progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 3rem;
+  border-radius: 0.5rem;
+}
+
+.btn-custom {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}

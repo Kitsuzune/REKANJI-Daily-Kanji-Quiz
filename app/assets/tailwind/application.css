@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Custom fonts for Kanji display */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+.kanji-character {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', '游ゴシック', 'Yu Gothic', sans-serif;
+}

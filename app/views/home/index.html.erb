@@ -1,0 +1,117 @@
+<% if user_signed_in? %>
+  <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-blue-700 text-white rounded-xl p-8 mb-8 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome back, <%= current_user.email.split('@').first.capitalize %>!</h1>
+    <p class="text-xl opacity-90">Ready to continue your kanji learning journey?</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">Your Progress</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <% %w[N5 N4 N3].each do |level| %>
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-800"><%= level %></h3>
+              <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full <%= level == 'N5' ? 'bg-green-100 text-green-800' : level == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                <%= level %>
+              </span>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm text-gray-600">
+                <span>Progress</span>
+                <span><%= @user_progress[level] || 0 %>/<%= @total_kanjis[level] || 0 %></span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <% progress_percent = @total_kanjis[level] > 0 ? ((@user_progress[level] || 0).to_f / @total_kanjis[level] * 100).round : 0 %>
+                <div class="h-2 rounded-full <%= level == 'N5' ? 'bg-green-500' : level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>" style="width: <%= progress_percent %>%"></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Practice Options</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% %w[N5 N4 N3].each do |level| %>
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2"><%= level %> Practice</h4>
+              <p class="text-gray-600 text-sm mb-4"><%= @total_kanjis[level] || 0 %> kanji available</p>
+              <div class="flex space-x-2">
+                <%= link_to "Practice", quiz_practice_path(level), 
+                    class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" %>
+                <%= link_to "Single", quiz_single_path(level), 
+                    class: "border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium" %>
+              </div>
+            </div>
+          <% end %>
+          <div class="border border-yellow-200 rounded-lg p-4 hover:border-yellow-400 transition-colors bg-yellow-50">
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Mixed Practice</h4>
+            <p class="text-gray-600 text-sm mb-4">Challenge with all levels</p>
+            <%= link_to "Start Mixed", quiz_mixed_path, 
+                class: "bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h3>
+      <% if @recent_attempts&.any? %>
+        <div class="space-y-3">
+          <% @recent_attempts.each do |attempt| %>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 <%= attempt.is_correct? ? 'border-green-500' : 'border-red-500' %>">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-2xl kanji-character"><%= attempt.kanji_character.character %></div>
+                  <div class="text-sm text-gray-600"><%= attempt.kanji_character.meaning %></div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    <%= time_ago_in_words(attempt.attempted_at) %> ago
+                  </div>
+                </div>
+                <div class="text-2xl">
+                  <%= attempt.is_correct? ? '✅' : '❌' %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+          <div class="text-4xl mb-4">📚</div>
+          <h6 class="text-lg font-semibold text-blue-800 mb-2">No attempts yet!</h6>
+          <p class="text-blue-600 text-sm">Start practicing to see your progress here.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+<% else %>
+  <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-blue-700 text-white rounded-xl p-12 mb-12 text-center">
+    <h1 class="text-5xl md:text-6xl font-bold mb-4">漢字学習</h1>
+    <h2 class="text-3xl md:text-4xl font-light mb-6">Master Japanese Kanji</h2>
+    <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">Learn and practice Japanese kanji characters from JLPT N5 to N3 levels with interactive quizzes and track your progress.</p>
+    <div class="space-x-4">
+      <%= link_to "Get Started", new_user_registration_path, class: "bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors font-bold text-lg" %>
+      <%= link_to "Login", new_user_session_path, class: "border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 transition-colors font-bold text-lg" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow duration-300">
+      <div class="text-6xl mb-6">📚</div>
+      <h4 class="text-2xl font-bold text-gray-800 mb-4">Structured Learning</h4>
+      <p class="text-gray-600">Practice kanji organized by JLPT levels (N5, N4, N3) with meanings and readings.</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow duration-300">
+      <div class="text-6xl mb-6">🎯</div>
+      <h4 class="text-2xl font-bold text-gray-800 mb-4">Track Progress</h4>
+      <p class="text-gray-600">Monitor your learning journey with detailed progress tracking and performance analytics.</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow duration-300">
+      <div class="text-6xl mb-6">🧠</div>
+      <h4 class="text-2xl font-bold text-gray-800 mb-4">Interactive Quizzes</h4>
+      <p class="text-gray-600">Test your knowledge with multiple choice quizzes and immediate feedback on your answers.</p>
+    </div>
+  </div>
+<% end %>
