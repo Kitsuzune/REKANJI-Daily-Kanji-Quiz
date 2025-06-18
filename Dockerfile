@@ -64,7 +64,8 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Rails DB migrations and schema loading
 RUN ./bin/rails db:migrate && \
-    ./bin/rails db:seed && \
+    ./bin/rails db:seed
+
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 CMD ["./bin/rails", "server"]
