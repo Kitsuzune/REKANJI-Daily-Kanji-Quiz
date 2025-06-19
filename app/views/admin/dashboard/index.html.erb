@@ -1,0 +1,166 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-8 mb-8">
+      <h1 class="text-4xl font-bold mb-2">Admin Dashboard</h1>
+      <p class="text-xl opacity-90">Manage users, kanji data, and monitor application activity</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center">
+          <div class="text-3xl mr-4">👥</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800">Total Users</h3>
+            <p class="text-3xl font-bold text-blue-600"><%= @total_users %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center">
+          <div class="text-3xl mr-4">📝</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800">Single Kanji</h3>
+            <p class="text-3xl font-bold text-green-600"><%= @total_single_kanji %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center">
+          <div class="text-3xl mr-4">📚</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800">Multiple Kanji</h3>
+            <p class="text-3xl font-bold text-purple-600"><%= @total_multiple_kanji %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center">
+          <div class="text-3xl mr-4">🎯</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800">Quiz Attempts</h3>
+            <p class="text-3xl font-bold text-indigo-600"><%= @quiz_stats[:total_attempts] %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Statistics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Quiz Performance</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Total Attempts:</span>
+            <span class="font-bold text-blue-600"><%= @quiz_stats[:total_attempts] %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Correct Answers:</span>
+            <span class="font-bold text-green-600"><%= @quiz_stats[:total_correct] %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Overall Accuracy:</span>
+            <span class="font-bold text-purple-600">
+              <%= @quiz_stats[:total_attempts] > 0 ? ((@quiz_stats[:total_correct].to_f / @quiz_stats[:total_attempts]) * 100).round(1) : 0 %>%
+            </span>
+          </div>
+          <div class="border-t pt-4">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Daily Attempts:</span>
+              <span class="font-bold text-indigo-600"><%= @quiz_stats[:daily_attempts] %></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Weekly Attempts:</span>
+              <span class="font-bold text-indigo-600"><%= @quiz_stats[:weekly_attempts] %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Attempts by Level</h3>
+        <div class="space-y-4">
+          <% %w[N5 N4 N3].each do |level| %>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium"><%= level %>:</span>
+              <span class="font-bold <%= level == 'N5' ? 'text-green-600' : level == 'N4' ? 'text-yellow-600' : 'text-red-600' %>">
+                <%= @quiz_stats[:attempts_by_level][level] || 0 %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+        
+        <h4 class="text-lg font-semibold text-gray-800 mt-6 mb-4">By Quiz Type</h4>
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Single Kanji:</span>
+            <span class="font-bold text-blue-600"><%= @quiz_stats[:attempts_by_type]['single'] || 0 %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Multiple Kanji:</span>
+            <span class="font-bold text-purple-600"><%= @quiz_stats[:attempts_by_type]['multiple'] || 0 %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Users and Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Most Active Users</h3>
+        <div class="space-y-3">
+          <% @top_users.each_with_index do |(email, attempts), index| %>
+            <div class="flex justify-between items-center p-3 <%= index < 3 ? 'bg-yellow-50 rounded-lg' : '' %>">
+              <div class="flex items-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 text-sm font-medium mr-3">
+                  #<%= index + 1 %>
+                </span>
+                <span class="text-gray-800"><%= email.split('@').first %></span>
+              </div>
+              <span class="font-bold text-blue-600"><%= attempts %> attempts</span>
+            </div>
+          <% end %>
+          <% if @top_users.empty? %>
+            <p class="text-gray-500 text-center py-4">No quiz attempts yet</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h3>
+        <div class="space-y-3">
+          <%= link_to admin_kanji_singles_path, class: "block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" do %>
+            📝 Manage Single Kanji
+          <% end %>
+          
+          <%= link_to admin_kanji_multiples_path, class: "block w-full bg-purple-600 text-white text-center py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium" do %>
+            📚 Manage Multiple Kanji
+          <% end %>
+          
+          <%= link_to admin_users_path, class: "block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition-colors font-medium" do %>
+            👥 Manage Users
+          <% end %>
+          
+          <button class="block w-full bg-indigo-600 text-white text-center py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+            📊 View Reports
+          </button>
+        </div>
+        
+        <div class="mt-6 pt-6 border-t">
+          <h4 class="text-lg font-semibold text-gray-800 mb-3">Recent Users</h4>
+          <div class="space-y-2">
+            <% @recent_users.each do |user| %>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600"><%= user.email.split('@').first %></span>
+                <span class="text-gray-500"><%= time_ago_in_words(user.created_at) %> ago</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

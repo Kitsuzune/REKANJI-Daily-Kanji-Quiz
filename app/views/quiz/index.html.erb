@@ -14,29 +14,22 @@
         </h4>
       </div>
       <div class="p-4 md:p-6 text-center">
-        <div class="text-3xl md:text-4xl font-bold text-gray-800 mb-2"><%= @kanji_counts[level] %></div>
-        <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6">kanji available</p>
+        <div class="mb-4">
+          <div class="text-lg md:text-xl font-bold text-gray-800">Single Kanji</div>
+          <div class="text-2xl md:text-3xl font-bold text-blue-600 mb-2"><%= @kanji_single_counts[level] %></div>
+          <p class="text-sm md:text-base text-gray-600 mb-3">kanji available</p>
+          <%= link_to "Practice Single", quiz_single_path(level), 
+              class: "block w-full bg-blue-600 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base mb-2" %>
+        </div>
         
-        <div class="space-y-2 md:space-y-3">
-          <%= link_to "Practice #{level}", quiz_practice_path(level), 
-              class: "block w-full bg-blue-600 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base" %>
-          <%= link_to "Single Mode", quiz_single_path(level), 
-              class: "block w-full border border-blue-600 text-blue-600 py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm md:text-base" %>
+        <div class="border-t pt-4">
+          <div class="text-lg md:text-xl font-bold text-gray-800">Multiple Kanji</div>
+          <div class="text-2xl md:text-3xl font-bold text-purple-600 mb-2"><%= @kanji_multiple_counts[level] %></div>
+          <p class="text-sm md:text-base text-gray-600 mb-3">jyukugo available</p>
+          <%= link_to "Practice Multiple", quiz_multiple_path(level), 
+              class: "block w-full bg-purple-600 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm md:text-base" %>
         </div>
       </div>
     </div>
   <% end %>
-</div>
-
-<div class="max-w-lg mx-auto px-4">
-  <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg overflow-hidden">
-    <div class="bg-yellow-500 text-white text-center py-3 md:py-4">
-      <h4 class="text-xl md:text-2xl font-bold">Mixed Practice</h4>
-    </div>
-    <div class="p-4 md:p-6 text-center">
-      <p class="text-sm md:text-base text-gray-700 mb-4 md:mb-6">Challenge yourself with kanji from all levels!</p>
-      <%= link_to "Start Mixed Practice", quiz_mixed_path, 
-          class: "block w-full bg-yellow-500 text-white py-3 md:py-4 px-4 md:px-6 rounded-lg hover:bg-yellow-600 transition-colors font-bold text-base md:text-lg" %>
-    </div>
-  </div>
 </div>

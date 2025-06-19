@@ -2,11 +2,19 @@
   <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-blue-700 text-white rounded-xl p-8 mb-8 text-center">
     <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome back, <%= current_user.email.split('@').first.capitalize %>!</h1>
     <p class="text-xl opacity-90">Ready to continue your kanji learning journey?</p>
+    <% if current_user.superadmin? %>
+      <div class="mt-4">
+        <%= link_to "Admin Dashboard", admin_root_path, class: "bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-colors font-medium" %>
+      </div>
+    <% end %>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
     <div class="lg:col-span-2">
-      <h2 class="text-3xl font-bold text-gray-800 mb-6">Your Progress</h2>
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">Available Kanji</h2>
+      
+      <!-- Progress Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <% %w[N5 N4 N3].each do |level| %>
           <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
@@ -16,71 +24,189 @@
                 <%= level %>
               </span>
             </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm text-gray-600">
-                <span>Progress</span>
-                <span><%= @user_progress[level] || 0 %>/<%= @total_kanjis[level] || 0 %></span>
+            
+            <!-- Statistics -->
+            <div class="grid grid-cols-3 gap-2 mb-4 text-center text-sm">
+              <div>
+                <div class="text-lg font-bold text-green-600"><%= @progress_for_level[level][:correct] %></div>
+                <div class="text-gray-600">Correct</div>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <% progress_percent = @total_kanjis[level] > 0 ? ((@user_progress[level] || 0).to_f / @total_kanjis[level] * 100).round : 0 %>
-                <div class="h-2 rounded-full <%= level == 'N5' ? 'bg-green-500' : level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>" style="width: <%= progress_percent %>%"></div>
+              <div>
+                <div class="text-lg font-bold text-blue-600"><%= @progress_for_level[level][:total] %></div>
+                <div class="text-gray-600">Attempts</div>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-purple-600"><%= @progress_for_level[level][:accuracy] %>%</div>
+                <div class="text-gray-600">Accuracy</div>
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <% if @progress_for_level[level][:total] > 0 %>
+              <div class="mb-4">
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <span>Progress</span>
+                  <span><%= @progress_for_level[level][:correct] %>/<%= @progress_for_level[level][:total] %></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-300" 
+                       style="width: <%= @progress_for_level[level][:accuracy] %>%"></div>
+                </div>
+              </div>
+            <% else %>
+              <div class="mb-4">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">No attempts yet</p>
+              </div>
+            <% end %>
+            
+            <!-- Available Kanji Count -->
+            <div class="border-t pt-3 mt-3">
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="text-center">
+                  <div class="font-semibold text-blue-600"><%= @total_single_kanjis[level] || 0 %></div>
+                  <div class="text-gray-600">Single Kanji</div>
+                </div>
+                <div class="text-center">
+                  <div class="font-semibold text-purple-600"><%= @total_multiple_kanjis[level] || 0 %></div>
+                  <div class="text-gray-600">Multiple Kanji</div>
+                </div>
               </div>
             </div>
           </div>
         <% end %>
       </div>
       
-      <div class="bg-white rounded-xl shadow-lg p-6">
+      <!-- Practice Options -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Practice Options</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <% %w[N5 N4 N3].each do |level| %>
             <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
               <h4 class="text-lg font-semibold text-gray-800 mb-2"><%= level %> Practice</h4>
-              <p class="text-gray-600 text-sm mb-4"><%= @total_kanjis[level] || 0 %> kanji available</p>
+              <p class="text-gray-600 text-sm mb-4">
+                Single: <%= @total_single_kanjis[level] || 0 %> | 
+                Multiple: <%= @total_multiple_kanjis[level] || 0 %>
+              </p>
               <div class="flex space-x-2">
-                <%= link_to "Practice", quiz_practice_path(level), 
-                    class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" %>
                 <%= link_to "Single", quiz_single_path(level), 
-                    class: "border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium" %>
+                    class: "flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" %>
+                <%= link_to "Multiple", quiz_multiple_path(level), 
+                    class: "flex-1 bg-purple-600 text-white text-center py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium" %>
               </div>
             </div>
           <% end %>
-          <div class="border border-yellow-200 rounded-lg p-4 hover:border-yellow-400 transition-colors bg-yellow-50">
-            <h4 class="text-lg font-semibold text-gray-800 mb-2">Mixed Practice</h4>
-            <p class="text-gray-600 text-sm mb-4">Challenge with all levels</p>
-            <%= link_to "Start Mixed", quiz_mixed_path, 
-                class: "bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium" %>
+        </div>
+      </div>
+      
+      <!-- Exam Options -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">📝 Exam Center</h3>
+        <p class="text-gray-600 mb-6">Test your comprehensive knowledge with timed exams</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <% %w[N5 N4 N3].each do |level| %>
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors text-center">
+              <div class="text-2xl font-bold mb-2 <%= level == 'N5' ? 'text-green-600' : level == 'N4' ? 'text-yellow-600' : 'text-red-600' %>">
+                <%= level %>
+              </div>
+              <h4 class="text-lg font-semibold text-gray-800 mb-2">JLPT <%= level %></h4>
+              <p class="text-gray-600 text-xs mb-3">
+                <%= level == 'N5' ? 'Beginner' : level == 'N4' ? 'Elementary' : 'Intermediate' %>
+              </p>
+              <p class="text-gray-600 text-xs mb-4">
+                Available: <%= @total_single_kanjis[level] + @total_multiple_kanjis[level] %> kanji
+              </p>
+              <button onclick="window.location.href='<%= exam_path %>'" 
+                      class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-colors text-sm font-medium">
+                Take <%= level %> Exam
+              </button>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-lg font-semibold text-indigo-800 mb-1">Ready for a Challenge?</h4>
+              <p class="text-indigo-600 text-sm">Choose from Casual, Ambitious, or Dedicated exam modes</p>
+            </div>
+            <%= link_to "Start Exam", exam_path, class: "bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium" %>
           </div>
         </div>
       </div>
     </div>
     
-    <div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h3>
-      <% if @recent_attempts&.any? %>
-        <div class="space-y-3">
-          <% @recent_attempts.each do |attempt| %>
-            <div class="bg-white rounded-lg shadow p-4 border-l-4 <%= attempt.is_correct? ? 'border-green-500' : 'border-red-500' %>">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-bold text-2xl kanji-character"><%= attempt.kanji_character.character %></div>
-                  <div class="text-sm text-gray-600"><%= attempt.kanji_character.meaning %></div>
-                  <div class="text-xs text-gray-500 mt-1">
-                    <%= time_ago_in_words(attempt.attempted_at) %> ago
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Overall Statistics -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Your Progress</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Total Attempts:</span>
+            <span class="font-bold text-blue-600"><%= @user_stats[:attempts] %></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Correct Answers:</span>
+            <span class="font-bold text-green-600"><%= @user_stats[:correct] %></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Overall Accuracy:</span>
+            <span class="font-bold text-purple-600"><%= @user_stats[:accuracy] %>%</span>
+          </div>
+        </div>
+        
+        <!-- Overall Progress Bar -->
+        <% if @user_stats[:attempts] > 0 %>
+          <div class="mt-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+              <span>Overall Progress</span>
+              <span><%= @user_stats[:correct] %>/<%= @user_stats[:attempts] %></span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-300" 
+                   style="width: <%= @user_stats[:accuracy] %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Recent Activity -->
+      <% if @recent_attempts.any? %>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Activity</h3>
+          <div class="space-y-3">
+            <% @recent_attempts.limit(5).each do |attempt| %>
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="text-xl font-bold text-gray-800">
+                    <%= attempt.kanji.kanji if attempt.kanji %>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-800">
+                      <%= attempt.quiz_type.capitalize %> - <%= attempt.level %>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      <%= time_ago_in_words(attempt.answered_at) %> ago
+                    </div>
                   </div>
                 </div>
-                <div class="text-2xl">
-                  <%= attempt.is_correct? ? '✅' : '❌' %>
-                </div>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full <%= attempt.correct? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                  <%= attempt.correct? ? '✓' : '✗' %>
+                </span>
               </div>
-            </div>
-          <% end %>
+            <% end %>
+          </div>
         </div>
       <% else %>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <div class="text-4xl mb-4">📚</div>
-          <h6 class="text-lg font-semibold text-blue-800 mb-2">No attempts yet!</h6>
-          <p class="text-blue-600 text-sm">Start practicing to see your progress here.</p>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+          <div class="text-4xl mb-4">🎯</div>
+          <h3 class="text-lg font-semibold text-blue-800 mb-2">Start Your Journey!</h3>
+          <p class="text-blue-600 text-sm mb-4">Begin practicing to track your progress!</p>
+          <%= link_to "Start Quiz", quiz_path, class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
         </div>
       <% end %>
     </div>

@@ -11,9 +11,29 @@
       </div>
       <div class="p-4 md:p-8">
         <div class="text-center mb-6 md:mb-8">
-          <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @kanji.character %></div>
-          <p class="text-lg md:text-2xl text-gray-700 mb-2">What does this kanji mean?</p>
-          <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.reading %></p>
+          <!-- Question display based on question type -->
+          <% case @question_type %>
+          <% when 1 # Kanji -> Meaning %>
+            <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @kanji.kanji %></div>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2">What does this kanji mean?</p>
+            <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.display_reading %></p>
+          <% when 2 # Kanji -> Reading %>
+            <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @kanji.kanji %></div>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2">How do you read this kanji?</p>
+            <p class="text-base md:text-lg text-gray-500">Meaning: <%= @kanji.meaning_id %></p>
+          <% when 3 # Meaning -> Kanji %>
+            <div class="bg-blue-50 rounded-xl p-6 md:p-8 mb-4">
+              <div class="text-2xl md:text-4xl font-bold text-blue-800 mb-2"><%= @kanji.meaning_id %></div>
+            </div>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this meaning?</p>
+            <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.display_reading %></p>
+          <% when 4 # Reading -> Kanji %>
+            <div class="bg-purple-50 rounded-xl p-6 md:p-8 mb-4">
+              <div class="text-2xl md:text-4xl font-bold text-purple-800 mb-2"><%= get_clean_reading(@kanji) %></div>
+            </div>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this reading?</p>
+            <p class="text-base md:text-lg text-gray-500">Meaning: <%= @kanji.meaning_id %></p>
+          <% end %>
         </div>
         
         <%= form_with url: quiz_answer_path, method: :post, class: "quiz-form" do |form| %>

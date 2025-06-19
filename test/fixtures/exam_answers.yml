@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  exam_attempt: one
+  kanji_id: 1
+  kanji_type: MyString
+  question_type: MyString
+  user_answer: MyString
+  correct_answer: MyString
+  is_correct: false
+
+two:
+  exam_attempt: two
+  kanji_id: 1
+  kanji_type: MyString
+  question_type: MyString
+  user_answer: MyString
+  correct_answer: MyString
+  is_correct: false

@@ -1,86 +1,125 @@
 class QuizController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_user_or_superadmin
   
   def index
     @levels = %w[N5 N4 N3]
-    @kanji_counts = {
-      'N5' => KanjiCharacter.by_level('N5').count,
-      'N4' => KanjiCharacter.by_level('N4').count,
-      'N3' => KanjiCharacter.by_level('N3').count
+    @kanji_single_counts = {
+      'N5' => KanjiSingle.by_rate('N5').count,
+      'N4' => KanjiSingle.by_rate('N4').count,
+      'N3' => KanjiSingle.by_rate('N3').count
     }
-  end
-
-  def practice
-    @level = params[:level]
-    redirect_to quiz_path unless %w[N5 N4 N3].include?(@level)
-    
-    @kanji = KanjiCharacter.by_level(@level).random_selection(1).first
-    redirect_to quiz_path, alert: "No kanji available for #{@level}" unless @kanji
-    
-    if @kanji
-      # Generate multiple choice options
-      @options = generate_options(@kanji)
-      session[:current_kanji_id] = @kanji.id
-      session[:current_level] = @level
-    end
+    @kanji_multiple_counts = {
+      'N5' => KanjiMultiple.by_rate('N5').count,
+      'N4' => KanjiMultiple.by_rate('N4').count,
+      'N3' => KanjiMultiple.by_rate('N3').count
+    }
   end
 
   def single
     @level = params[:level]
     redirect_to quiz_path unless %w[N5 N4 N3].include?(@level)
     
-    # Same as practice but single mode
-    @kanji = KanjiCharacter.by_level(@level).random_selection(1).first
-    redirect_to quiz_path, alert: "No kanji available for #{@level}" unless @kanji
+    @kanji = KanjiSingle.by_rate(@level).random_sample(1).first
+    redirect_to quiz_path, alert: "No single kanji available for #{@level}" unless @kanji
     
     if @kanji
-      @options = generate_options(@kanji)
+      # Randomly choose question type (1-4)
+      @question_type = rand(1..4)
+      @options = generate_single_options(@kanji, @question_type)
       session[:current_kanji_id] = @kanji.id
       session[:current_level] = @level
       session[:quiz_mode] = 'single'
+      session[:quiz_type] = 'single'
+      session[:question_type] = @question_type
     end
   end
 
-  def mixed
-    @kanji = KanjiCharacter.random_selection(1).first
-    redirect_to quiz_path, alert: "No kanji available" unless @kanji
+  def multiple
+    @level = params[:level]
+    redirect_to quiz_path unless %w[N5 N4 N3].include?(@level)
+    
+    @kanji = KanjiMultiple.by_rate(@level).random_sample(1).first
+    redirect_to quiz_path, alert: "No multiple kanji available for #{@level}" unless @kanji
     
     if @kanji
-      @options = generate_options(@kanji, mixed: true)
+      # Generate multiple choice options for multiple kanji (jyukugo)
+      @options = generate_multiple_options(@kanji)
       session[:current_kanji_id] = @kanji.id
-      session[:quiz_mode] = 'mixed'
+      session[:current_level] = @level
+      session[:quiz_mode] = 'multiple'
+      session[:quiz_type] = 'multiple'
     end
   end
   
   def answer
-    kanji = KanjiCharacter.find_by(id: session[:current_kanji_id])
+    quiz_type = session[:quiz_type]
+    kanji_id = session[:current_kanji_id]
+    question_type = session[:question_type] || 1
+    
+    if quiz_type == 'single'
+      kanji = KanjiSingle.find_by(id: kanji_id)
+    else
+      kanji = KanjiMultiple.find_by(id: kanji_id)
+    end
+    
     if kanji.nil?
       redirect_to quiz_path, alert: "Session expired" 
       return
     end
     
     selected_answer = params[:answer]&.strip
-    is_correct = selected_answer == kanji.meaning.strip
+    
+    # Determine correct answer based on question type
+    correct_answer = case question_type
+                    when 1 # Kanji -> Meaning
+                      kanji.meaning_id.strip
+                    when 2 # Kanji -> Reading
+                      if quiz_type == 'single'
+                        # Get clean reading without parentheses for single kanji
+                        get_clean_reading(kanji)
+                      else
+                        kanji.reading.strip
+                      end
+                    when 3 # Meaning -> Kanji
+                      kanji.kanji.strip
+                    when 4 # Reading -> Kanji
+                      kanji.kanji.strip
+                    else
+                      kanji.meaning_id.strip
+                    end
+    
+    is_correct = selected_answer == correct_answer
     
     # Debug logging
+    Rails.logger.debug "Question type: #{question_type}"
     Rails.logger.debug "Selected answer: '#{selected_answer}'"
-    Rails.logger.debug "Correct answer: '#{kanji.meaning}'"
+    Rails.logger.debug "Correct answer: '#{correct_answer}'"
     Rails.logger.debug "Is correct: #{is_correct}"
     
-    # Record user progress
-    current_user.user_progresses.create!(
-      kanji_character: kanji,
-      is_correct: is_correct,
-      attempted_at: Time.current
-    )
+    # Record quiz attempt for logged-in users
+    if current_user
+      current_user.quiz_attempts.create!(
+        quiz_type: quiz_type,
+        kanji_type: quiz_type == 'single' ? 'KanjiSingle' : 'KanjiMultiple',
+        level: session[:current_level],
+        kanji_id: kanji.id,
+        correct: is_correct,
+        answered_at: Time.current
+      )
+    end
     
     session[:last_result] = {
-      "kanji" => kanji.character,
-      "meaning" => kanji.meaning,
-      "reading" => kanji.reading,
+      "kanji" => kanji.kanji,
+      "meaning" => kanji.meaning_id,
+      "reading" => quiz_type == 'single' ? kanji.display_reading : kanji.reading,
       "selected" => selected_answer,
+      "correct_answer" => correct_answer,
       "is_correct" => is_correct,
-      "level" => kanji.level
+      "rate" => kanji.rate,
+      "quiz_type" => quiz_type,
+      "question_type" => question_type,
+      "description" => quiz_type == 'single' ? kanji.description_id : nil
     }
     
     redirect_to quiz_result_path
@@ -97,28 +136,100 @@ class QuizController < ApplicationController
   
   private
   
-  def generate_options(kanji, mixed: false)
-    correct_answer = kanji.meaning
-    
-    # Get wrong options from the same level or mixed levels
-    if mixed
-      wrong_kanjis = KanjiCharacter.where.not(id: kanji.id).random_selection(3)
-    else
-      wrong_kanjis = KanjiCharacter.by_level(kanji.level).where.not(id: kanji.id).random_selection(3)
-      # If not enough options in the same level, get from other levels
+  def generate_single_options(kanji, question_type = 1)
+    case question_type
+    when 1 # Kanji -> Meaning
+      correct_answer = kanji.meaning_id
+      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
       if wrong_kanjis.count < 3
         additional_needed = 3 - wrong_kanjis.count
-        additional_kanjis = KanjiCharacter.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
-                                 .random_selection(additional_needed)
+        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
+                                 .random_sample(additional_needed)
         wrong_kanjis += additional_kanjis
       end
+      wrong_answers = wrong_kanjis.pluck(:meaning_id)
+      
+    when 2 # Kanji -> Reading
+      correct_answer = get_clean_reading(kanji)
+      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+      if wrong_kanjis.count < 3
+        additional_needed = 3 - wrong_kanjis.count
+        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
+                                 .random_sample(additional_needed)
+        wrong_kanjis += additional_kanjis
+      end
+      wrong_answers = wrong_kanjis.map { |k| get_clean_reading(k) }
+      
+    when 3 # Meaning -> Kanji
+      correct_answer = kanji.kanji
+      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+      if wrong_kanjis.count < 3
+        additional_needed = 3 - wrong_kanjis.count
+        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
+                                 .random_sample(additional_needed)
+        wrong_kanjis += additional_kanjis
+      end
+      wrong_answers = wrong_kanjis.pluck(:kanji)
+      
+    when 4 # Reading -> Kanji
+      correct_answer = kanji.kanji
+      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+      if wrong_kanjis.count < 3
+        additional_needed = 3 - wrong_kanjis.count
+        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
+                                 .random_sample(additional_needed)
+        wrong_kanjis += additional_kanjis
+      end
+      wrong_answers = wrong_kanjis.pluck(:kanji)
+      
+    else
+      correct_answer = kanji.meaning_id
+      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+      wrong_answers = wrong_kanjis.pluck(:meaning_id)
     end
     
-    wrong_answers = wrong_kanjis.pluck(:meaning)
     options = ([correct_answer] + wrong_answers).shuffle
     
     # Debug logging
-    Rails.logger.debug "Generated options: #{options.inspect}"
+    Rails.logger.debug "Generated single options for type #{question_type}: #{options.inspect}"
+    Rails.logger.debug "Correct answer: '#{correct_answer}'"
+    
+    options
+  end
+  
+  def get_clean_reading(kanji)
+    # Get the first clean reading without parentheses
+    readings = []
+    readings << kanji.onyomi if kanji.onyomi.present? && !kanji.onyomi.include?('-')
+    readings << kanji.kunyomi if kanji.kunyomi.present? && !kanji.kunyomi.include?('-')
+    
+    # Remove parentheses content and clean up
+    clean_readings = readings.map do |reading|
+      reading.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip
+    end.reject(&:empty?)
+    
+    clean_readings.first || kanji.onyomi || kanji.kunyomi || ""
+  end
+  
+  def generate_multiple_options(kanji)
+    correct_answer = kanji.meaning_id
+    
+    # Get wrong options from the same rate
+    wrong_kanjis = KanjiMultiple.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+    
+    # If not enough options in the same rate, get from other rates
+    if wrong_kanjis.count < 3
+      additional_needed = 3 - wrong_kanjis.count
+      additional_kanjis = KanjiMultiple.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
+                                .random_sample(additional_needed)
+      wrong_kanjis += additional_kanjis
+    end
+    
+    wrong_answers = wrong_kanjis.pluck(:meaning_id)
+    options = ([correct_answer] + wrong_answers).shuffle
+    
+    # Debug logging
+    Rails.logger.debug "Generated multiple options: #{options.inspect}"
     Rails.logger.debug "Correct answer: '#{correct_answer}'"
     
     options

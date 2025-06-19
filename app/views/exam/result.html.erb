@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-8 mb-8 text-center">
+      <h1 class="text-4xl font-bold mb-4">Exam Complete!</h1>
+      <p class="text-xl opacity-90">Here are your results</p>
+    </div>
+
+    <!-- Score Card -->
+    <div class="bg-white rounded-xl shadow-lg p-8 mb-8 text-center">
+      <div class="mb-6">
+        <div class="text-6xl font-bold mb-4 <%= score_color_class(@exam_attempt.score) %>">
+          <%= @exam_attempt.score %>%
+        </div>
+        <div class="text-2xl font-semibold text-gray-800 mb-2">
+          <%= score_status(@exam_attempt.score) %>
+        </div>
+        <div class="text-lg text-gray-600">
+          <%= @exam_attempt.correct_answers %> out of <%= @exam_attempt.total_questions %> questions correct
+        </div>
+      </div>
+      
+      <!-- Score Breakdown -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-green-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-green-600"><%= @exam_attempt.correct_answers %></div>
+          <div class="text-sm text-green-700">Correct</div>
+        </div>
+        <div class="bg-red-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-red-600"><%= @exam_attempt.total_questions - @exam_attempt.correct_answers %></div>
+          <div class="text-sm text-red-700">Incorrect</div>
+        </div>
+        <div class="bg-blue-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-blue-600"><%= time_taken(@exam_attempt) %></div>
+          <div class="text-sm text-blue-700">Time Taken</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div class="<%= score_color_class(@exam_attempt.score) %> h-4 rounded-full transition-all duration-500" 
+               style="width: <%= @exam_attempt.score %>%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center space-y-4">
+      <%= link_to "Take Another Exam", exam_path, 
+          class: "inline-block bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium mr-4" %>
+      
+      <%= link_to "Back to Home", root_path, 
+          class: "inline-block bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium" %>
+    </div>
+  </div>
+</div>

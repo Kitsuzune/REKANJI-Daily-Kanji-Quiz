@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  level: MyString
+  exam_mode: MyString
+  total_questions: 1
+  correct_answers: 1
+  score: 9.99
+  started_at: 2025-06-19 18:31:18
+  completed_at: 2025-06-19 18:31:18
+
+two:
+  user: two
+  level: MyString
+  exam_mode: MyString
+  total_questions: 1
+  correct_answers: 1
+  score: 9.99
+  started_at: 2025-06-19 18:31:18
+  completed_at: 2025-06-19 18:31:18

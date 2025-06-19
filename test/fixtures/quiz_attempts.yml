@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  quiz_type: MyString
+  kanji_type: MyString
+  level: MyString
+  kanji_id: 1
+  correct: false
+  answered_at: 2025-06-19 17:44:48
+
+two:
+  user: two
+  quiz_type: MyString
+  kanji_type: MyString
+  level: MyString
+  kanji_id: 1
+  correct: false
+  answered_at: 2025-06-19 17:44:48

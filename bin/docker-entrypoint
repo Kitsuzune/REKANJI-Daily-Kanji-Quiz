@@ -3,13 +3,13 @@
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   ./bin/rails db:prepare
 
-  # Jalankan seed hanya jika tabel User kosong (ganti sesuai kebutuhan)
-  if ./bin/rails runner "exit(User.any? ? 0 : 1)"; then
-    echo "Skipping seed: users already exist"
-  else
-    echo "Running db:seed..."
-    ./bin/rails db:seed
-  fi
+  # # Jalankan seed hanya jika tabel User kosong (ganti sesuai kebutuhan)
+  # if ./bin/rails runner "exit(User.any? ? 0 : 1)"; then
+  #   echo "Skipping seed: users already exist"
+  # else
+  #   echo "Running db:seed..."
+  #   ./bin/rails db:seed
+  # fi
 fi
 
 exec "${@}"

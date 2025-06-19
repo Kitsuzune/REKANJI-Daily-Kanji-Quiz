@@ -1,11 +1,4 @@
 <% if @result %>
-  <!-- Debug info (remove in production) -->
-  <%# <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm">
-    <strong>Debug:</strong> 
-    Symbol key: <%= @result[:is_correct].inspect %> | 
-    String key: <%= @result["is_correct"].inspect %> | 
-    Helper result: <%= result_is_correct?(@result) %>
-  </div> %>
 
   <div class="max-w-4xl mx-auto px-4">
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -29,31 +22,48 @@
                 <%= @result["selected"] %>
               </p>
             </div>
-          </div>
-
-          <div class="bg-gray-50 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
+          </div>          <div class="bg-gray-50 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
             <h6 class="text-base md:text-lg font-semibold text-gray-700 mb-2">Reading</h6>
             <p class="text-lg md:text-xl text-gray-800"><%= @result["reading"] %></p>
-            <% if @result["level"] %>
-              <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full mt-2 <%= @result["level"] == 'N5' ? 'bg-green-100 text-green-800' : @result["level"] == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
-                <%= @result["level"] %>
-              </span>
-            <% end %>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <% if @result["rate"] %>
+                <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full <%= @result["rate"] == 'N5' ? 'bg-green-100 text-green-800' : @result["rate"] == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                  <%= @result["rate"] %>
+                </span>
+              <% end %>
+              <% if @result["quiz_type"] %>
+                <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full <%= @result["quiz_type"] == 'single' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' %>">
+                  <%= @result["quiz_type"].humanize %> Kanji
+                </span>
+              <% end %>
+              <% if @result["question_type"] %>
+                <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-800">
+                  Question Type <%= @result["question_type"] %>
+                </span>
+              <% end %>
+            </div>
           </div>
+          
+          <!-- Kanji Description -->
+          <% if @result["description"].present? %>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
+              <h6 class="text-base md:text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                <span class="mr-2">📖</span>
+                Kanji Explanation
+              </h6>
+              <p class="text-gray-700 leading-relaxed"><%= @result["description"] %></p>
+            </div>
+          <% end %>
         </div>
-        
-        <div class="text-center flex flex-col sm:flex-row justify-center gap-3 md:gap-4">
-          <% if session[:quiz_mode] == 'single' %>
-            <%= link_to "Try Another #{session[:current_level]}", 
+          <div class="text-center flex flex-col sm:flex-row justify-center gap-3 md:gap-4">
+          <% if session[:quiz_type] == 'single' %>
+            <%= link_to "Try Another Single #{session[:current_level]}", 
                 quiz_single_path(session[:current_level]), 
                 class: "bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base" %>
-          <% elsif session[:quiz_mode] == 'mixed' %>
-            <%= link_to "Try Another Mixed", quiz_mixed_path, 
-                class: "bg-yellow-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm md:text-base" %>
-          <% else %>
-            <%= link_to "Continue Practice", 
-                quiz_practice_path(session[:current_level]), 
-                class: "bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base" %>
+          <% elsif session[:quiz_type] == 'multiple' %>
+            <%= link_to "Try Another Multiple #{session[:current_level]}", 
+                quiz_multiple_path(session[:current_level]), 
+                class: "bg-purple-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm md:text-base" %>
           <% end %>
           
           <%= link_to "Back to Quiz Menu", quiz_path, 
