@@ -20,6 +20,7 @@
           <div class="hidden md:flex items-center space-x-6">
             <%= link_to "Home", root_path, class: "text-white hover:text-blue-200 transition-colors" %>
             <% if user_signed_in? %>
+              <%= link_to "Learn", learn_path, class: "text-white hover:text-blue-200 transition-colors" %>
               <%= link_to "Practice", quiz_path, class: "text-white hover:text-blue-200 transition-colors" %>
             <% end %>
           </div>

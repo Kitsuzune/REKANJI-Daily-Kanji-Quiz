@@ -76,7 +76,28 @@
               </div>
             </div>
           </div>
-        <% end %>
+        <% end %>      </div>
+      
+      <!-- Learn Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">📚 Learn Kanji</h3>
+        <p class="text-gray-600 mb-6">Study kanji characters with detailed information including readings, meanings, and descriptions</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <% %w[N5 N4 N3].each do |level| %>
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition-colors">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2"><%= level %> Kanji</h4>
+              <p class="text-gray-600 text-sm mb-4">
+                Explore <%= @total_single_kanjis[level] || 0 %> single + <%= @total_multiple_kanjis[level] || 0 %> multiple kanji
+              </p>              <div class="flex space-x-2">
+                <%= link_to "Learn Single", learn_path(level: level, type: 'single'), 
+                    class: "flex-1 bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium" %>
+                <%= link_to "Learn Multiple", learn_path(level: level, type: 'multiple'), 
+                    class: "flex-1 bg-emerald-600 text-white text-center py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
       </div>
       
       <!-- Practice Options -->

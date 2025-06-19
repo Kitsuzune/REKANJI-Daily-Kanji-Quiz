@@ -17,6 +17,10 @@ Rails.application.routes.draw do
   post 'exam/:id/answer', to: 'exam#answer', as: 'exam_answer'
   get 'exam/:id/result', to: 'exam#result', as: 'exam_result'
   
+  # Learn routes
+  get 'learn', to: 'learn#index', as: 'learn'
+  get 'learn/:type/:id', to: 'learn#show', as: 'learn_show'
+  
   # Admin routes (only for superadmin)
   namespace :admin do
     resources :users

@@ -1,0 +1,147 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl p-8 mb-8 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">📚 Learn Kanji</h1>
+      <p class="text-xl opacity-90">Explore and study Japanese kanji characters</p>
+    </div>
+
+    <!-- Level and Type Selector -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+        <!-- Level Selector -->
+        <div class="flex space-x-2">
+          <span class="text-gray-700 font-medium mr-2">Level:</span>
+          <% %w[N5 N4 N3].each do |level| %>
+            <%= link_to level, learn_path(level: level, type: @kanji_type, page: 1), 
+                class: "px-4 py-2 rounded-lg font-medium transition-colors #{@level == level ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+          <% end %>
+        </div>
+        
+        <!-- Type Selector -->
+        <div class="flex space-x-2">
+          <span class="text-gray-700 font-medium mr-2">Type:</span>
+          <%= link_to "Single Kanji", learn_path(level: @level, type: 'single', page: 1), 
+              class: "px-4 py-2 rounded-lg font-medium transition-colors #{@kanji_type == 'single' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+          <%= link_to "Multiple Kanji", learn_path(level: @level, type: 'multiple', page: 1), 
+              class: "px-4 py-2 rounded-lg font-medium transition-colors #{@kanji_type == 'multiple' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+        </div>
+      </div>
+      
+      <!-- Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600"><%= @stats[:single_count] %></div>
+          <div class="text-sm text-gray-600">Single Kanji</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600"><%= @stats[:multiple_count] %></div>
+          <div class="text-sm text-gray-600">Multiple Kanji</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600"><%= @stats[:total_count] %></div>
+          <div class="text-sm text-gray-600">Total Kanji</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanji Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+      <% @kanjis.each do |kanji| %>
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <%= link_to learn_show_path(@kanji_type, kanji.id), class: "block" do %>
+            <!-- Kanji Character -->
+            <div class="bg-gradient-to-br from-gray-100 to-gray-200 p-8 text-center">
+              <div class="text-6xl font-bold text-gray-800 mb-2"><%= kanji.kanji %></div>
+              <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full <%= kanji.rate == 'N5' ? 'bg-green-100 text-green-800' : kanji.rate == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                <%= kanji.rate %>
+              </span>
+            </div>
+            
+            <!-- Kanji Info -->
+            <div class="p-6">
+              <!-- Meaning -->
+              <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Meaning</h3>
+                <p class="text-gray-600"><%= kanji.meaning_id %></p>
+              </div>
+              
+              <!-- Readings -->
+              <% if @kanji_type == 'single' %>
+                <div class="space-y-2">
+                  <% if kanji.onyomi.present? %>
+                    <div>
+                      <span class="text-sm font-medium text-blue-600">Onyomi:</span>
+                      <span class="text-sm text-gray-700"><%= kanji.onyomi %></span>
+                    </div>
+                  <% end %>
+                  <% if kanji.kunyomi.present? %>
+                    <div>
+                      <span class="text-sm font-medium text-green-600">Kunyomi:</span>
+                      <span class="text-sm text-gray-700"><%= kanji.kunyomi %></span>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <div>
+                  <span class="text-sm font-medium text-purple-600">Reading:</span>
+                  <span class="text-sm text-gray-700"><%= kanji.reading %></span>
+                </div>
+              <% end %>
+              
+              <!-- Description Preview -->
+              <% if kanji.description_id.present? %>
+                <div class="mt-4 pt-4 border-t">
+                  <p class="text-xs text-gray-500 line-clamp-2">
+                    <%= truncate(kanji.description_id, length: 80) %>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <% if @total_pages > 1 %>
+      <div class="flex justify-center items-center space-x-2">
+        <!-- Previous Page -->
+        <% if @page > 1 %>
+          <%= link_to "← Previous", learn_path(level: @level, type: @kanji_type, page: @page - 1), 
+              class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
+        <% end %>
+        
+        <!-- Page Numbers -->
+        <% start_page = [@page - 2, 1].max %>
+        <% end_page = [start_page + 4, @total_pages].min %>
+        <% start_page = [end_page - 4, 1].max %>
+        
+        <% (start_page..end_page).each do |page_num| %>
+          <%= link_to page_num, learn_path(level: @level, type: @kanji_type, page: page_num), 
+              class: "px-4 py-2 rounded-lg transition-colors #{page_num == @page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+        <% end %>
+        
+        <!-- Next Page -->
+        <% if @page < @total_pages %>
+          <%= link_to "Next →", learn_path(level: @level, type: @kanji_type, page: @page + 1), 
+              class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
+        <% end %>
+      </div>
+      
+      <!-- Page Info -->
+      <div class="text-center mt-4 text-gray-600">
+        Showing <%= (@page - 1) * @per_page + 1 %> to <%= [@page * @per_page, @total_count].min %> of <%= @total_count %> kanji
+      </div>
+    <% end %>
+
+    <!-- Empty State -->
+    <% if @kanjis.empty? %>
+      <div class="text-center py-12">
+        <div class="text-6xl mb-4">📚</div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Kanji Found</h3>
+        <p class="text-gray-600">No kanji available for this level and type.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
