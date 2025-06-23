@@ -219,8 +219,7 @@
                   <%= attempt.correct? ? '✓' : '✗' %>
                 </span>
               </div>
-            <% end %>
-          </div>
+            <% end %>          </div>
         </div>
       <% else %>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
@@ -228,6 +227,54 @@
           <h3 class="text-lg font-semibold text-blue-800 mb-2">Start Your Journey!</h3>
           <p class="text-blue-600 text-sm mb-4">Begin practicing to track your progress!</p>
           <%= link_to "Start Quiz", quiz_path, class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+        </div>
+      <% end %>
+      
+      <!-- Recent Exams -->
+      <% if @recent_exams&.any? %>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Recent Exams</h3>
+            <%= link_to "View All", exam_history_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
+          </div>
+          <div class="space-y-3">
+            <% @recent_exams.each do |exam| %>
+              <div class="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full <%= exam.level == 'N5' ? 'bg-green-100 text-green-800' : exam.level == 'N4' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                      <%= exam.level %>
+                    </span>
+                    <span class="text-sm font-medium text-gray-700"><%= exam.exam_mode.capitalize %></span>
+                  </div>
+                  <span class="text-sm font-bold <%= exam.score >= 80 ? 'text-green-600' : exam.score >= 60 ? 'text-yellow-600' : 'text-red-600' %>">
+                    <%= exam.score %>%
+                  </span>
+                </div>
+                
+                <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                  <span><%= exam.correct_answers %>/<%= exam.total_questions %> correct</span>
+                  <span><%= time_ago_in_words(exam.completed_at) %> ago</span>
+                </div>
+                
+                <!-- Score Progress Bar -->
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                  <div class="<%= exam.score >= 80 ? 'bg-green-500' : exam.score >= 60 ? 'bg-yellow-500' : 'bg-red-500' %> h-2 rounded-full transition-all duration-300" 
+                       style="width: <%= exam.score %>%"></div>
+                </div>
+                
+                <%= link_to "View Details", exam_result_path(exam), 
+                    class: "inline-block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-purple-50 border border-purple-200 rounded-xl p-6 text-center">
+          <div class="text-4xl mb-4">📝</div>
+          <h3 class="text-lg font-semibold text-purple-800 mb-2">No Exams Yet</h3>
+          <p class="text-purple-600 text-sm mb-4">Take your first exam to see results here!</p>
+          <%= link_to "Start Exam", exam_path, class: "bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium" %>
         </div>
       <% end %>
     </div>

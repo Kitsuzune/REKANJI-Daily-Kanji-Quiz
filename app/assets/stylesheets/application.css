@@ -39,3 +39,36 @@
     padding: 0 1rem;
   }
 }
+
+/* Progress bar styles - simplified and reliable */
+.progress-bar-container {
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar {
+  height: 100%;
+  background: white;
+  border-radius: inherit;
+  transition: width 0.8s ease-out !important;
+  will-change: width;
+}
+
+.progress-bar-animated {
+  animation: progressPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes progressPulse {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Exam specific styles */
+.exam-progress-text {
+  transition: all 0.3s ease;
+}

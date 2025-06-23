@@ -28,8 +28,21 @@
             <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this meaning?</p>
             <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.display_reading %></p>
           <% when 4 # Reading -> Kanji %>
-            <div class="bg-purple-50 rounded-xl p-6 md:p-8 mb-4">
-              <div class="text-2xl md:text-4xl font-bold text-purple-800 mb-2"><%= get_clean_reading(@kanji) %></div>
+            <div class="bg-purple-50 rounded-xl p-6 md:p-8 mb-4 text-center">
+              <div class="text-lg md:text-xl font-semibold text-purple-800 mb-4">
+                <% if @kanji.onyomi.present? && !@kanji.onyomi.include?('-') %>
+                  <div class="mb-2">
+                    <span class="text-gray-600">Onyomi:</span> 
+                    <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
+                  </div>
+                <% end %>
+                <% if @kanji.kunyomi.present? && !@kanji.kunyomi.include?('-') %>
+                  <div>
+                    <span class="text-gray-600">Kunyomi:</span> 
+                    <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
+                  </div>
+                <% end %>
+              </div>
             </div>
             <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this reading?</p>
             <p class="text-base md:text-lg text-gray-500">Meaning: <%= @kanji.meaning_id %></p>
@@ -40,11 +53,34 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
             <% @options.each_with_index do |option, index| %>
               <label class="quiz-option cursor-pointer p-4 md:p-6 rounded-lg border-2 border-gray-200 hover:border-cyan-400 hover:bg-cyan-50 transition-all duration-200 transform hover:-translate-y-1 hover:shadow-md">
-                <%= form.radio_button :answer, option, 
-                    class: "sr-only", 
-                    id: "option_#{index}",
-                    required: true %>
-                <span class="block text-base md:text-lg font-semibold text-center"><%= option %></span>
+                <% if @question_type == 2 && option.respond_to?(:onyomi) %>
+                  <!-- For Kanji -> Reading type, use kanji id as value -->
+                  <%= form.radio_button :answer, option.id, 
+                      class: "sr-only", 
+                      id: "option_#{index}",
+                      required: true %>
+                  <div class="text-center">
+                    <% if option.onyomi.present? && !option.onyomi.include?('-') %>
+                      <div class="text-sm text-gray-600 mb-1">
+                        <span class="font-medium">Onyomi:</span> 
+                        <span class="text-base font-bold text-blue-700"><%= option.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
+                      </div>
+                    <% end %>
+                    <% if option.kunyomi.present? && !option.kunyomi.include?('-') %>
+                      <div class="text-sm text-gray-600">
+                        <span class="font-medium">Kunyomi:</span> 
+                        <span class="text-base font-bold text-green-700"><%= option.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <!-- For other question types, use string value -->
+                  <%= form.radio_button :answer, option, 
+                      class: "sr-only", 
+                      id: "option_#{index}",
+                      required: true %>
+                  <span class="block text-base md:text-lg font-semibold text-center"><%= option %></span>
+                <% end %>
               </label>
             <% end %>
           </div>

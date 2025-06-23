@@ -38,6 +38,13 @@ class HomeController < ApplicationController
                                     .limit(10)
                                     .includes(:user)
       
+      # Recent exam attempts
+      @recent_exams = current_user.exam_attempts
+                                 .completed
+                                 .order(completed_at: :desc)
+                                 .limit(5)
+                                 .includes(:exam_answers)
+      
       # Correct and incorrect attempts by level
       @progress_for_level = {}
       %w[N5 N4 N3].each do |level|

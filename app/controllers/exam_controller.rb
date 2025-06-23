@@ -89,7 +89,6 @@ class ExamController < ApplicationController
 
   def show
     @current_question_number = session[:current_question_number] || 1
-    @current_question_index = @current_question_number
     @total_questions = @exam_attempt.total_questions
     
     # Calculate time remaining in seconds for more accurate calculation
@@ -141,7 +140,10 @@ class ExamController < ApplicationController
     end
     
     @options = @question[:options]
-    @progress_percentage = ((@current_question_number - 1).to_f / @exam_attempt.total_questions * 100).round
+    @progress_percentage = (@current_question_number.to_f / @exam_attempt.total_questions * 100).round(2)
+    
+    # Debug logging for progress
+    Rails.logger.debug "Progress: Question #{@current_question_number} of #{@exam_attempt.total_questions} = #{@progress_percentage}%"
     
     # Check if time expired
     if @exam_attempt.time_expired?
@@ -164,7 +166,15 @@ class ExamController < ApplicationController
       return
     end
     
-    is_correct = user_answer == exam_answer.correct_answer
+    # For kanji_to_reading questions, we need to compare kanji IDs instead of readings
+    if exam_answer.question_type == 'kanji_to_reading' && exam_answer.kanji.respond_to?(:onyomi)
+      # User selected a kanji ID, compare with correct kanji ID
+      is_correct = user_answer == exam_answer.kanji.id.to_s
+    else
+      # For other question types, use direct string comparison
+      is_correct = user_answer == exam_answer.correct_answer
+    end
+    
     exam_answer.update!(
       user_answer: user_answer,
       is_correct: is_correct
@@ -174,6 +184,7 @@ class ExamController < ApplicationController
     session[:current_question_number] = next_question
     
     Rails.logger.debug "Updated session to question number: #{next_question}"
+    Rails.logger.debug "Session current_question_number: #{session[:current_question_number]}"
     
     if next_question > @exam_attempt.total_questions
       complete_exam(@exam_attempt)
@@ -272,10 +283,16 @@ class ExamController < ApplicationController
     when 'kanji_to_meaning'
       kanji.meaning_id
     when 'kanji_to_reading'
-      if kanji.respond_to?(:display_reading)
-        get_clean_reading(kanji)
+      if kanji.respond_to?(:onyomi) && kanji.respond_to?(:kunyomi)
+        # For single kanji with structured reading, use kanji ID for comparison
+        kanji.id.to_s
       else
-        kanji.reading
+        # For multiple kanji, use reading string
+        if kanji.respond_to?(:display_reading)
+          get_clean_reading(kanji)
+        else
+          kanji.reading
+        end
       end
     when 'meaning_to_kanji'
       kanji.kanji
@@ -293,8 +310,20 @@ class ExamController < ApplicationController
     when 'meaning_to_kanji'
       "Kanji mana yang memiliki arti: #{kanji.meaning_id}?"
     when 'reading_to_kanji'
-      reading = kanji.respond_to?(:display_reading) ? get_clean_reading(kanji) : kanji.reading
-      "Kanji mana yang dibaca: #{reading}?"
+      if kanji.respond_to?(:onyomi) && kanji.respond_to?(:kunyomi)
+        reading_parts = []
+        if kanji.onyomi.present? && !kanji.onyomi.include?('-')
+          reading_parts << "Onyomi: #{kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip}"
+        end
+        if kanji.kunyomi.present? && !kanji.kunyomi.include?('-')
+          reading_parts << "Kunyomi: #{kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip}"
+        end
+        reading_display = reading_parts.any? ? reading_parts.join(" / ") : get_clean_reading(kanji)
+        "Kanji mana yang dibaca: #{reading_display}?"
+      else
+        reading = kanji.respond_to?(:reading) ? kanji.reading : get_clean_reading(kanji)
+        "Kanji mana yang dibaca: #{reading}?"
+      end
     else
       "Unknown question type"
     end
@@ -321,19 +350,55 @@ class ExamController < ApplicationController
     case question_type
     when 'kanji_to_meaning'
       # Get wrong meanings from same level
-      wrong_kanjis = get_similar_kanjis(kanji, 3)
-      wrong_answers = wrong_kanjis.map(&:meaning_id)
+      wrong_kanjis = get_similar_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.map(&:meaning_id).uniq.reject { |answer| answer == correct_answer }
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
+      
     when 'kanji_to_reading'
-      # Get wrong readings from same level
-      wrong_kanjis = get_similar_kanjis(kanji, 3)
-      wrong_answers = wrong_kanjis.map { |k| k.respond_to?(:display_reading) ? get_clean_reading(k) : k.reading }
+      # For reading questions, return kanji objects with reading info
+      if kanji.respond_to?(:onyomi) && kanji.respond_to?(:kunyomi)
+        # For single kanji, create structured reading options
+        wrong_kanjis = get_similar_kanjis(kanji, 6).select do |k|
+          # Only include kanji that have valid readings (not just "-")
+          (k.onyomi.present? && !k.onyomi.include?('-')) || (k.kunyomi.present? && !k.kunyomi.include?('-'))
+        end
+        
+        # Remove duplicates based on reading
+        wrong_answers = wrong_kanjis.uniq { |k| get_clean_reading(k) }.reject { |k| get_clean_reading(k) == get_clean_reading(kanji) }
+        final_wrong_answers = wrong_answers.take(3)
+        
+        # Create structured options with kanji info
+        options = ([kanji] + final_wrong_answers).shuffle.map do |k|
+          {
+            'kanji_id' => k.id,
+            'onyomi' => k.onyomi.present? && !k.onyomi.include?('-') ? k.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip : nil,
+            'kunyomi' => k.kunyomi.present? && !k.kunyomi.include?('-') ? k.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip : nil
+          }
+        end
+      else
+        # For multiple kanji, use regular reading strings
+        wrong_kanjis = get_similar_kanjis(kanji, 6) # Get more to ensure uniqueness
+        wrong_answers = wrong_kanjis.map { |k| k.respond_to?(:display_reading) ? get_clean_reading(k) : k.reading }.uniq.reject { |answer| answer == correct_answer }
+        # Take only 3 wrong answers and shuffle with correct answer
+        final_wrong_answers = wrong_answers.take(3)
+        options = ([correct_answer] + final_wrong_answers).shuffle
+      end
+      
     when 'meaning_to_kanji', 'reading_to_kanji'
       # Get wrong kanji characters from same level
-      wrong_kanjis = get_similar_kanjis(kanji, 3)
-      wrong_answers = wrong_kanjis.map(&:kanji)
+      wrong_kanjis = get_similar_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.map(&:kanji).uniq.reject { |answer| answer == correct_answer }
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
     end
     
-    ([correct_answer] + wrong_answers).uniq.shuffle
+    Rails.logger.debug "Generated options for #{question_type}: #{options.inspect}"
+    Rails.logger.debug "Correct answer: #{correct_answer}"
+    
+    options
   end
 
   def get_similar_kanjis(kanji, count)
@@ -341,23 +406,24 @@ class ExamController < ApplicationController
     kanji_type = kanji.class.name
     
     if kanji_type == 'KanjiSingle'
-      similar = KanjiSingle.by_rate(level).where.not(id: kanji.id).limit(count * 2).to_a
+      similar = KanjiSingle.by_rate(level).where.not(id: kanji.id).order('RANDOM()').limit(count).to_a
     else
-      similar = KanjiMultiple.by_rate(level).where.not(id: kanji.id).limit(count * 2).to_a
+      similar = KanjiMultiple.by_rate(level).where.not(id: kanji.id).order('RANDOM()').limit(count).to_a
     end
     
     # If not enough from same level, get from other levels
     if similar.count < count
       additional_needed = count - similar.count
       if kanji_type == 'KanjiSingle'
-        additional = KanjiSingle.where.not(id: [kanji.id] + similar.map(&:id)).limit(additional_needed).to_a
+        additional = KanjiSingle.where.not(id: [kanji.id] + similar.map(&:id)).order('RANDOM()').limit(additional_needed).to_a
       else
-        additional = KanjiMultiple.where.not(id: [kanji.id] + similar.map(&:id)).limit(additional_needed).to_a
+        additional = KanjiMultiple.where.not(id: [kanji.id] + similar.map(&:id)).order('RANDOM()').limit(additional_needed).to_a
       end
       similar += additional
     end
     
-    similar.sample(count)
+    # Use shuffle to ensure better randomization
+    similar.shuffle
   end
 
   def complete_exam(exam_attempt)

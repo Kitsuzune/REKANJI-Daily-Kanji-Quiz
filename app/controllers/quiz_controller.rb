@@ -76,8 +76,8 @@ class QuizController < ApplicationController
                       kanji.meaning_id.strip
                     when 2 # Kanji -> Reading
                       if quiz_type == 'single'
-                        # Get clean reading without parentheses for single kanji
-                        get_clean_reading(kanji)
+                        # For reading questions, we compare kanji IDs
+                        kanji.id.to_s
                       else
                         kanji.reading.strip
                       end
@@ -109,12 +109,28 @@ class QuizController < ApplicationController
       )
     end
     
+    # Prepare result data
+    selected_display = if question_type == 2 && quiz_type == 'single'
+                        # For reading questions, show the selected kanji's reading
+                        selected_kanji = KanjiSingle.find_by(id: selected_answer)
+                        selected_kanji ? selected_kanji.display_reading : selected_answer
+                      else
+                        selected_answer
+                      end
+    
+    correct_display = if question_type == 2 && quiz_type == 'single'
+                       # For reading questions, show the correct reading
+                       get_clean_reading(kanji)
+                     else
+                       correct_answer
+                     end
+    
     session[:last_result] = {
       "kanji" => kanji.kanji,
       "meaning" => kanji.meaning_id,
       "reading" => quiz_type == 'single' ? kanji.display_reading : kanji.reading,
-      "selected" => selected_answer,
-      "correct_answer" => correct_answer,
+      "selected" => selected_display,
+      "correct_answer" => correct_display,
       "is_correct" => is_correct,
       "rate" => kanji.rate,
       "quiz_type" => quiz_type,
@@ -140,59 +156,63 @@ class QuizController < ApplicationController
     case question_type
     when 1 # Kanji -> Meaning
       correct_answer = kanji.meaning_id
-      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
-      if wrong_kanjis.count < 3
-        additional_needed = 3 - wrong_kanjis.count
-        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
-                                 .random_sample(additional_needed)
-        wrong_kanjis += additional_kanjis
-      end
-      wrong_answers = wrong_kanjis.pluck(:meaning_id)
+      wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+      
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
       
     when 2 # Kanji -> Reading
-      correct_answer = get_clean_reading(kanji)
-      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
-      if wrong_kanjis.count < 3
-        additional_needed = 3 - wrong_kanjis.count
-        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
-                                 .random_sample(additional_needed)
-        wrong_kanjis += additional_kanjis
+      # For reading questions, we need to return kanji objects to show onyomi/kunyomi
+      correct_answer = kanji
+      wrong_kanjis = get_random_wrong_kanjis(kanji, 6).select do |k|
+        # Only include kanji that have valid readings (not just "-")
+        (k.onyomi.present? && !k.onyomi.include?('-')) || (k.kunyomi.present? && !k.kunyomi.include?('-'))
       end
-      wrong_answers = wrong_kanjis.map { |k| get_clean_reading(k) }
+      
+      # Remove duplicates based on reading
+      wrong_answers = wrong_kanjis.uniq { |k| get_clean_reading(k) }.reject { |k| get_clean_reading(k) == get_clean_reading(kanji) }
+      
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
       
     when 3 # Meaning -> Kanji
       correct_answer = kanji.kanji
-      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
-      if wrong_kanjis.count < 3
-        additional_needed = 3 - wrong_kanjis.count
-        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
-                                 .random_sample(additional_needed)
-        wrong_kanjis += additional_kanjis
-      end
-      wrong_answers = wrong_kanjis.pluck(:kanji)
+      wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.pluck(:kanji).uniq.reject { |answer| answer == correct_answer }
+      
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
       
     when 4 # Reading -> Kanji
       correct_answer = kanji.kanji
-      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
-      if wrong_kanjis.count < 3
-        additional_needed = 3 - wrong_kanjis.count
-        additional_kanjis = KanjiSingle.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
-                                 .random_sample(additional_needed)
-        wrong_kanjis += additional_kanjis
-      end
-      wrong_answers = wrong_kanjis.pluck(:kanji)
+      wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.pluck(:kanji).uniq.reject { |answer| answer == correct_answer }
+      
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
       
     else
       correct_answer = kanji.meaning_id
-      wrong_kanjis = KanjiSingle.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
-      wrong_answers = wrong_kanjis.pluck(:meaning_id)
+      wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
+      wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+      
+      # Take only 3 wrong answers and shuffle with correct answer
+      final_wrong_answers = wrong_answers.take(3)
+      options = ([correct_answer] + final_wrong_answers).shuffle
     end
-    
-    options = ([correct_answer] + wrong_answers).shuffle
     
     # Debug logging
     Rails.logger.debug "Generated single options for type #{question_type}: #{options.inspect}"
-    Rails.logger.debug "Correct answer: '#{correct_answer}'"
+    if question_type == 2
+      Rails.logger.debug "Correct reading: '#{get_clean_reading(kanji)}'"
+    else
+      Rails.logger.debug "Correct answer: '#{correct_answer}'"
+    end
     
     options
   end
@@ -215,23 +235,46 @@ class QuizController < ApplicationController
     correct_answer = kanji.meaning_id
     
     # Get wrong options from the same rate
-    wrong_kanjis = KanjiMultiple.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(3)
+    wrong_kanjis = KanjiMultiple.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(6) # Get more to ensure uniqueness
     
     # If not enough options in the same rate, get from other rates
-    if wrong_kanjis.count < 3
-      additional_needed = 3 - wrong_kanjis.count
+    if wrong_kanjis.count < 6
+      additional_needed = 6 - wrong_kanjis.count
       additional_kanjis = KanjiMultiple.where.not(id: [kanji.id] + wrong_kanjis.pluck(:id))
                                 .random_sample(additional_needed)
       wrong_kanjis += additional_kanjis
     end
     
-    wrong_answers = wrong_kanjis.pluck(:meaning_id)
-    options = ([correct_answer] + wrong_answers).shuffle
+    wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+    
+    # Take only 3 wrong answers and shuffle with correct answer
+    final_wrong_answers = wrong_answers.take(3)
+    options = ([correct_answer] + final_wrong_answers).shuffle
     
     # Debug logging
     Rails.logger.debug "Generated multiple options: #{options.inspect}"
     Rails.logger.debug "Correct answer: '#{correct_answer}'"
     
     options
+  end
+  
+  def get_random_wrong_kanjis(correct_kanji, count = 6)
+    # First try to get from same level
+    same_level_kanjis = KanjiSingle.by_rate(correct_kanji.rate)
+                                   .where.not(id: correct_kanji.id)
+                                   .order('RANDOM()')
+                                   .limit(count)
+    
+    # If we don't have enough from same level, get from other levels
+    if same_level_kanjis.count < count
+      additional_needed = count - same_level_kanjis.count
+      other_level_kanjis = KanjiSingle.where.not(id: [correct_kanji.id] + same_level_kanjis.pluck(:id))
+                                     .order('RANDOM()')
+                                     .limit(additional_needed)
+      
+      same_level_kanjis + other_level_kanjis
+    else
+      same_level_kanjis
+    end
   end
 end
