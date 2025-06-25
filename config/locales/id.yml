@@ -16,6 +16,7 @@ id:
     edit: "Edit"
     delete: "Hapus"
     confirm: "Konfirmasi"
+    confirm_logout: "Apakah Anda yakin ingin keluar?"
     loading: "Memuat..."
     search: "Cari"
     filter: "Filter"
@@ -352,3 +353,193 @@ id:
     details: "Detail"
     showing: "Menampilkan"
     no_data_found: "Tidak Ada Data Ditemukan"
+
+  # Authentication
+  auth:
+    # Login page
+    login:
+      title: "Masuk ke Akun Anda"
+      subtitle: "Lanjutkan perjalanan belajar kanji Anda"
+      email_label: "Email"
+      email_placeholder: "Masukkan email Anda"
+      password_label: "Password"
+      password_placeholder: "Masukkan password Anda"
+      remember_me: "Ingat saya"
+      submit_button: "Masuk"
+      
+    # Registration page
+    register:
+      title: "Buat Akun Baru"
+      subtitle: "Mulai perjalanan belajar kanji Anda"
+      email_label: "Email"
+      email_placeholder: "Masukkan email Anda"
+      password_label: "Password"
+      password_placeholder: "Buat password yang kuat"
+      password_confirmation_label: "Konfirmasi Password"
+      password_confirmation_placeholder: "Ulangi password Anda"
+      password_minimum_length: "(minimal %{count} karakter)"
+      submit_button: "Daftar"
+      
+    # Password reset
+    password_reset:
+      title: "Lupa Password?"
+      subtitle: "Masukkan email Anda untuk reset password"
+      email_label: "Email"
+      email_placeholder: "Masukkan email yang terdaftar"
+      submit_button: "Kirim Instruksi Reset Password"
+      
+    # Password edit
+    password_edit:
+      title: "Ubah Password Anda"
+      subtitle: "Masukkan password baru Anda di bawah"
+      new_password_label: "Password Baru"
+      new_password_placeholder: "Masukkan password baru"
+      confirm_password_label: "Konfirmasi Password Baru"
+      confirm_password_placeholder: "Konfirmasi password baru"
+      current_password_label: "Password Saat Ini"
+      current_password_placeholder: "Masukkan password saat ini untuk konfirmasi"
+      current_password_help: "Kami memerlukan password saat ini untuk mengkonfirmasi perubahan Anda"
+      submit_button: "Ubah Password"
+      
+    # Account edit
+    account_edit:
+      title: "Edit Akun Anda"
+      subtitle: "Perbarui informasi akun Anda"
+      email_label: "Email"
+      password_label: "Password"
+      password_placeholder: "Biarkan kosong jika tidak ingin mengubah"
+      password_confirmation_label: "Konfirmasi Password"
+      current_password_label: "Password Saat Ini"
+      current_password_placeholder: "Masukkan password saat ini untuk konfirmasi perubahan"
+      current_password_help: "Kami memerlukan password saat ini untuk mengkonfirmasi perubahan Anda"
+      submit_button: "Perbarui Akun"
+      cancel_account: "Batalkan Akun Saya"
+      unhappy: "Tidak puas?"
+      
+    # Email confirmation
+    confirmation:
+      title: "Kirim Ulang Instruksi Konfirmasi"
+      subtitle: "Tidak menerima email konfirmasi?"
+      email_label: "Email"
+      email_placeholder: "Masukkan email Anda"
+      submit_button: "Kirim Ulang Instruksi Konfirmasi"
+      
+    # Account unlock
+    unlock:
+      title: "Kirim Ulang Instruksi Unlock"
+      subtitle: "Akun terkunci?"
+      email_label: "Email"
+      email_placeholder: "Masukkan email Anda"
+      submit_button: "Kirim Ulang Instruksi Unlock"
+      
+    # Shared links
+    links:
+      sign_in: "Sudah punya akun? Masuk di sini"
+      sign_up: "Belum punya akun? Daftar di sini"
+      forgot_password: "Lupa password?"
+      no_confirmation: "Tidak menerima instruksi konfirmasi?"
+      no_unlock: "Tidak menerima instruksi unlock?"
+      
+    # Flash messages
+    messages:
+      signed_in: "Berhasil masuk."
+      signed_out: "Berhasil keluar."
+      signed_up: "Selamat datang! Anda berhasil mendaftar."
+      updated: "Akun Anda berhasil diperbarui."
+      destroyed: "Selamat tinggal! Akun Anda berhasil dibatalkan. Kami berharap dapat melihat Anda lagi segera."
+      already_signed_out: "Berhasil keluar."
+      unauthenticated: "Anda perlu masuk atau mendaftar sebelum melanjutkan."
+      unconfirmed: "Anda harus mengkonfirmasi alamat email Anda sebelum melanjutkan."
+      locked: "Akun Anda terkunci."
+      invalid: "Email atau password tidak valid."
+      invalid_token: "Token autentikasi tidak valid."
+      timeout: "Sesi Anda telah berakhir. Silakan masuk lagi untuk melanjutkan."
+      inactive: "Akun Anda belum diaktifkan."
+      not_found_in_database: "Email atau password tidak valid."
+      already_authenticated: "Anda sudah masuk."
+      send_instructions: "Anda akan menerima email dengan instruksi cara reset password dalam beberapa menit."
+      send_paranoid_instructions: "Jika alamat email Anda ada di database kami, Anda akan menerima link pemulihan password di alamat email Anda dalam beberapa menit."
+      updated_not_active: "Password Anda berhasil diubah."
+      updated_but_not_confirmed: "Akun Anda berhasil diperbarui, tetapi kami perlu memverifikasi alamat email baru Anda. Silakan periksa email Anda dan ikuti link konfirmasi untuk mengkonfirmasi alamat email baru Anda."
+      confirmation_instructions_sent: "Instruksi konfirmasi telah dikirim ke alamat email Anda."
+      
+    # Mailer subjects
+    mailer:
+      confirmation_subject: "Instruksi konfirmasi"
+      reset_password_subject: "Instruksi reset password"
+      unlock_subject: "Instruksi unlock"
+      email_changed_subject: "Email Diubah"
+      password_change_subject: "Password Diubah"
+
+  # Devise specific translations
+  devise:
+    failure:
+      user:
+        already_authenticated: "Anda sudah masuk."
+        unauthenticated: "Anda perlu masuk atau mendaftar sebelum melanjutkan."
+        unconfirmed: "Anda harus mengkonfirmasi alamat email Anda sebelum melanjutkan."
+        locked: "Akun Anda terkunci."
+        invalid: "Email atau password tidak valid."
+        invalid_token: "Token autentikasi tidak valid."
+        timeout: "Sesi Anda telah berakhir. Silakan masuk lagi untuk melanjutkan."
+        inactive: "Akun Anda belum diaktifkan."
+        not_found_in_database: "Email atau password tidak valid."
+        last_attempt: "Anda memiliki satu percobaan lagi sebelum akun Anda dikunci."
+      unauthenticated: "Anda perlu masuk atau mendaftar sebelum melanjutkan."
+      unconfirmed: "Anda harus mengkonfirmasi alamat email Anda sebelum melanjutkan."
+      locked: "Akun Anda terkunci."
+      invalid: "Email atau password tidak valid."
+      invalid_token: "Token autentikasi tidak valid."
+      timeout: "Sesi Anda telah berakhir. Silakan masuk lagi untuk melanjutkan."
+      inactive: "Akun Anda belum diaktifkan."
+      already_authenticated: "Anda sudah masuk."
+    sessions:
+      user:
+        signed_in: "Berhasil masuk."
+        signed_out: "Berhasil keluar."
+        already_signed_out: "Berhasil keluar."
+      signed_in: "Berhasil masuk."
+      signed_out: "Berhasil keluar."
+      already_signed_out: "Berhasil keluar."
+    registrations:
+      user:
+        signed_up: "Selamat datang! Anda berhasil mendaftar."
+        signed_up_but_unconfirmed: "Pesan dengan link konfirmasi telah dikirim ke alamat email Anda. Silakan ikuti link tersebut untuk mengaktifkan akun Anda."
+        signed_up_but_inactive: "Anda berhasil mendaftar. Namun, kami tidak dapat memasukkan Anda karena akun Anda belum diaktifkan."
+        signed_up_but_locked: "Anda berhasil mendaftar. Namun, kami tidak dapat memasukkan Anda karena akun Anda terkunci."
+        updated: "Akun Anda berhasil diperbarui."
+        updated_but_not_confirmed: "Akun Anda berhasil diperbarui, tetapi kami perlu memverifikasi alamat email baru Anda. Silakan periksa email Anda dan ikuti link konfirmasi untuk mengkonfirmasi alamat email baru Anda."
+        destroyed: "Selamat tinggal! Akun Anda berhasil dibatalkan. Kami berharap dapat melihat Anda lagi segera."
+      signed_up: "Selamat datang! Anda berhasil mendaftar."
+      signed_up_but_unconfirmed: "Pesan dengan link konfirmasi telah dikirim ke alamat email Anda. Silakan ikuti link tersebut untuk mengaktifkan akun Anda."
+      signed_up_but_inactive: "Anda berhasil mendaftar. Namun, kami tidak dapat memasukkan Anda karena akun Anda belum diaktifkan."
+      signed_up_but_locked: "Anda berhasil mendaftar. Namun, kami tidak dapat memasukkan Anda karena akun Anda terkunci."
+      updated: "Akun Anda berhasil diperbarui."
+      updated_but_not_confirmed: "Akun Anda berhasil diperbarui, tetapi kami perlu memverifikasi alamat email baru Anda. Silakan periksa email Anda dan ikuti link konfirmasi untuk mengkonfirmasi alamat email baru Anda."
+      destroyed: "Selamat tinggal! Akun Anda berhasil dibatalkan. Kami berharap dapat melihat Anda lagi segera."
+    passwords:
+      user:
+        send_instructions: "Anda akan menerima email dengan instruksi tentang cara mengatur ulang password Anda dalam beberapa menit."
+        send_paranoid_instructions: "Jika alamat email Anda ada dalam database kami, Anda akan menerima link pemulihan password di alamat email Anda dalam beberapa menit."
+        updated: "Password Anda berhasil diubah. Anda sekarang sudah masuk."
+        updated_not_active: "Password Anda berhasil diubah."
+      send_instructions: "Anda akan menerima email dengan instruksi tentang cara mengatur ulang password Anda dalam beberapa menit."
+      send_paranoid_instructions: "Jika alamat email Anda ada dalam database kami, Anda akan menerima link pemulihan password di alamat email Anda dalam beberapa menit."
+      updated: "Password Anda berhasil diubah. Anda sekarang sudah masuk."
+      updated_not_active: "Password Anda berhasil diubah."
+    confirmations:
+      user:
+        send_instructions: "Anda akan menerima email dengan instruksi untuk mengkonfirmasi alamat email Anda dalam beberapa menit."
+        send_paranoid_instructions: "Jika alamat email Anda ada dalam database kami, Anda akan menerima email dengan instruksi untuk mengkonfirmasi alamat email Anda dalam beberapa menit."
+        confirmed: "Alamat email Anda berhasil dikonfirmasi."
+      send_instructions: "Anda akan menerima email dengan instruksi untuk mengkonfirmasi alamat email Anda dalam beberapa menit."
+      send_paranoid_instructions: "Jika alamat email Anda ada dalam database kami, Anda akan menerima email dengan instruksi untuk mengkonfirmasi alamat email Anda dalam beberapa menit."
+      confirmed: "Alamat email Anda berhasil dikonfirmasi."
+    unlocks:
+      user:
+        send_instructions: "Anda akan menerima email dengan instruksi untuk membuka kunci akun Anda dalam beberapa menit."
+        send_paranoid_instructions: "Jika akun Anda ada, Anda akan menerima email dengan instruksi untuk membuka kuncinya dalam beberapa menit."
+        unlocked: "Akun Anda berhasil dibuka kuncinya. Silakan masuk untuk melanjutkan."
+      send_instructions: "Anda akan menerima email dengan instruksi untuk membuka kunci akun Anda dalam beberapa menit."
+      send_paranoid_instructions: "Jika akun Anda ada, Anda akan menerima email dengan instruksi untuk membuka kuncinya dalam beberapa menit."
+      unlocked: "Akun Anda berhasil dibuka kuncinya. Silakan masuk untuk melanjutkan."

@@ -4,7 +4,11 @@ Rails.application.routes.draw do
   
   # Language switching
   scope "/:locale", locale: /#{I18n.available_locales.join("|")}/ do
-    devise_for :users
+    devise_for :users, controllers: {
+      sessions: 'users/sessions',
+      registrations: 'users/registrations',
+      passwords: 'users/passwords'
+    }
     get '/', to: 'home#index', as: :localized_root
     
     # Quiz routes with new structure

@@ -15,13 +15,13 @@
     <nav class="bg-blue-600 shadow-lg">
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
-          <%= link_to "漢字学習", root_path, class: "text-white text-3xl font-bold hover:text-blue-200 transition-colors" %>
+          <%= link_to "漢字学習", root_path(locale: I18n.locale), class: "text-white text-3xl font-bold hover:text-blue-200 transition-colors" %>
           
           <div class="hidden md:flex items-center space-x-6">
-            <%= link_to "Home", root_path, class: "text-white hover:text-blue-200 transition-colors" %>
+            <%= link_to t('common.home'), root_path(locale: I18n.locale), class: "text-white hover:text-blue-200 transition-colors" %>
             <% if user_signed_in? %>
-              <%= link_to "Learn", learn_path, class: "text-white hover:text-blue-200 transition-colors" %>
-              <%= link_to "Practice", quiz_path, class: "text-white hover:text-blue-200 transition-colors" %>
+              <%= link_to t('nav.learn'), learn_path(locale: I18n.locale), class: "text-white hover:text-blue-200 transition-colors" %>
+              <%= link_to t('nav.practice'), quiz_path(locale: I18n.locale), class: "text-white hover:text-blue-200 transition-colors" %>
             <% end %>
           </div>
           
@@ -43,18 +43,18 @@
                   </svg>
                 </button>
                 <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
+                  <%= link_to t('nav.profile'), edit_user_registration_path(locale: I18n.locale), class: "block px-4 py-2 text-gray-800 hover:bg-gray-100" %>
                   <hr class="border-gray-200">
-                  <%= button_to "Logout", destroy_user_session_path, 
+                  <%= button_to t('common.logout'), destroy_user_session_path, 
                       method: :delete,
                       class: "block text-left w-full flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100 border-0 bg-transparent",
                       form: { class: "w-full" },
-                      data: { turbo_confirm: "Are you sure you want to logout?" } %>
+                      data: { turbo_confirm: t('common.confirm_logout') } %>
                 </div>
               </div>
             <% else %>
-              <%= link_to "Login", new_user_session_path, class: "text-white hover:text-blue-200 transition-colors" %>
-              <%= link_to "Sign Up", new_user_registration_path, class: "bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium" %>
+              <%= link_to t('common.login'), new_user_session_path(locale: I18n.locale), class: "text-white hover:text-blue-200 transition-colors" %>
+              <%= link_to t('common.register'), new_user_registration_path(locale: I18n.locale), class: "bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium" %>
             <% end %>
           </div>
         </div>
