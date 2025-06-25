@@ -9,8 +9,10 @@
     <!-- Score Card -->
     <div class="bg-white rounded-xl shadow-lg p-8 mb-8 text-center">
       <div class="mb-6">
-        <div class="text-6xl font-bold mb-4 <%= score_color_class(@exam_attempt.score) %>">
+        <div class="text-4xl font-bold mb-4 <%= score_color_class(@exam_attempt.score) %>">
+          <div class="text-white items-center justify-center p-3 inline-block">
           <%= @exam_attempt.score %>%
+          </div>
         </div>
         <div class="text-2xl font-semibold text-gray-800 mb-2">
           <%= score_status(@exam_attempt.score) %>
