@@ -13,6 +13,53 @@ module ApplicationHelper
     clean_readings.first || kanji.onyomi || kanji.kunyomi || ""
   end
   
+  # I18n helpers for kanji
+  def kanji_meaning(kanji_or_string)
+    # If it's already a string (like in quiz results), return as is
+    return kanji_or_string if kanji_or_string.is_a?(String)
+    
+    # If it's a kanji object, use the appropriate field based on locale
+    if I18n.locale == :en && kanji_or_string.respond_to?(:meaning_en) && kanji_or_string.meaning_en.present?
+      kanji_or_string.meaning_en
+    else
+      kanji_or_string.meaning_id
+    end
+  end
+  
+  def kanji_description(kanji_or_string)
+    # If it's already a string (like in quiz results), return as is
+    return kanji_or_string if kanji_or_string.is_a?(String)
+    
+    # If it's a kanji object, use the appropriate field based on locale
+    if I18n.locale == :en && kanji_or_string.respond_to?(:description_en) && kanji_or_string.description_en.present?
+      kanji_or_string.description_en
+    elsif kanji_or_string.respond_to?(:description_id) && kanji_or_string.description_id.present?
+      kanji_or_string.description_id
+    else
+      kanji.description
+    end
+  end
+  
+  # Language switcher helper
+  def language_switcher
+    content_tag :div, class: "flex space-x-2" do
+      I18n.available_locales.map do |locale|
+        link_to locale.to_s.upcase, 
+                url_for(locale: locale), 
+                class: "px-3 py-1 rounded #{I18n.locale == locale ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}"
+      end.join.html_safe
+    end
+  end
+  
+  # Time ago helper with proper locale handling
+  def time_ago_with_locale(time)
+    if I18n.locale == :id
+      "#{time_ago_in_words(time)} yang lalu"
+    else
+      "#{time_ago_in_words(time)} ago"
+    end
+  end
+  
   # Exam result helpers
   def score_color_class(score)
     case score

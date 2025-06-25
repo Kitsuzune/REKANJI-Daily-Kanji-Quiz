@@ -6,7 +6,7 @@
           <span class="inline-flex px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium <%= @level == 'N5' ? 'bg-green-500' : @level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>">
             <%= @level %>
           </span>
-          <span>Single Mode</span>
+          <span><%= t('learn.single_kanji') %> <%= t('home.practice') %></span>
         </h4>
       </div>
       <div class="p-4 md:p-8">
@@ -15,37 +15,37 @@
           <% case @question_type %>
           <% when 1 # Kanji -> Meaning %>
             <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @kanji.kanji %></div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">What does this kanji mean?</p>
-            <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.display_reading %></p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('practice.what_meaning') %></p>
+            <p class="text-base md:text-lg text-gray-500"><%= t('learn.reading') %>: <%= @kanji.display_reading %></p>
           <% when 2 # Kanji -> Reading %>
             <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @kanji.kanji %></div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">How do you read this kanji?</p>
-            <p class="text-base md:text-lg text-gray-500">Meaning: <%= @kanji.meaning_id %></p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('practice.how_read') %></p>
+            <p class="text-base md:text-lg text-gray-500"><%= t('learn.meaning') %>: <%= kanji_meaning(@kanji) %></p>
           <% when 3 # Meaning -> Kanji %>
             <div class="bg-blue-50 rounded-xl p-6 md:p-8 mb-4">
-              <div class="text-2xl md:text-4xl font-bold text-blue-800 mb-2"><%= @kanji.meaning_id %></div>
+              <div class="text-2xl md:text-4xl font-bold text-blue-800 mb-2"><%= kanji_meaning(@kanji) %></div>
             </div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this meaning?</p>
-            <p class="text-base md:text-lg text-gray-500">Reading: <%= @kanji.display_reading %></p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('practice.which_kanji_meaning') %></p>
+            <p class="text-base md:text-lg text-gray-500"><%= t('learn.reading') %>: <%= @kanji.display_reading %></p>
           <% when 4 # Reading -> Kanji %>
             <div class="bg-purple-50 rounded-xl p-6 md:p-8 mb-4 text-center">
               <div class="text-lg md:text-xl font-semibold text-purple-800 mb-4">
                 <% if @kanji.onyomi.present? && !@kanji.onyomi.include?('-') %>
                   <div class="mb-2">
-                    <span class="text-gray-600">Onyomi:</span> 
+                    <span class="text-gray-600"><%= t('learn.onyomi') %>:</span> 
                     <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                   </div>
                 <% end %>
                 <% if @kanji.kunyomi.present? && !@kanji.kunyomi.include?('-') %>
                   <div>
-                    <span class="text-gray-600">Kunyomi:</span> 
+                    <span class="text-gray-600"><%= t('learn.kunyomi') %>:</span> 
                     <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                   </div>
                 <% end %>
               </div>
             </div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this reading?</p>
-            <p class="text-base md:text-lg text-gray-500">Meaning: <%= @kanji.meaning_id %></p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('practice.which_kanji_reading') %></p>
+            <p class="text-base md:text-lg text-gray-500"><%= t('learn.meaning') %>: <%= kanji_meaning(@kanji) %></p>
           <% end %>
         </div>
         
@@ -62,13 +62,13 @@
                   <div class="text-center">
                     <% if option.onyomi.present? && !option.onyomi.include?('-') %>
                       <div class="text-sm text-gray-600 mb-1">
-                        <span class="font-medium">Onyomi:</span> 
+                        <span class="font-medium"><%= t('learn.onyomi') %>:</span> 
                         <span class="text-base font-bold text-blue-700"><%= option.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                       </div>
                     <% end %>
                     <% if option.kunyomi.present? && !option.kunyomi.include?('-') %>
                       <div class="text-sm text-gray-600">
-                        <span class="font-medium">Kunyomi:</span> 
+                        <span class="font-medium"><%= t('learn.kunyomi') %>:</span> 
                         <span class="text-base font-bold text-green-700"><%= option.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                       </div>
                     <% end %>
@@ -86,8 +86,8 @@
           </div>
           
           <div class="text-center flex flex-col sm:flex-row justify-center gap-3 md:gap-4">
-            <%= form.submit "Submit Answer", class: "bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg hover:bg-green-700 transition-colors font-bold text-base md:text-lg" %>
-            <%= link_to "Back to Quiz Menu", quiz_path, class: "bg-gray-500 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg hover:bg-gray-600 transition-colors font-bold text-base md:text-lg" %>
+            <%= form.submit t('practice.submit_answer'), class: "bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg hover:bg-green-700 transition-colors font-bold text-base md:text-lg" %>
+            <%= link_to t('practice.back_to_quiz_menu'), quiz_path, class: "bg-gray-500 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg hover:bg-gray-600 transition-colors font-bold text-base md:text-lg" %>
           </div>
         <% end %>
       </div>
@@ -118,9 +118,9 @@
   <div class="max-w-2xl mx-auto text-center px-4">
     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 md:p-8">
       <div class="text-4xl md:text-6xl mb-4">⚠️</div>
-      <h4 class="text-xl md:text-2xl font-bold text-yellow-800 mb-4">No Kanji Available</h4>
-      <p class="text-yellow-700 mb-4 md:mb-6">There are no kanji available for this level at the moment.</p>
-      <%= link_to "Back to Quiz Menu", quiz_path, class: "bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+      <h4 class="text-xl md:text-2xl font-bold text-yellow-800 mb-4"><%= t('learn.no_kanji_available') %></h4>
+      <p class="text-yellow-700 mb-4 md:mb-6"><%= t('learn.no_kanji_available') %></p>
+      <%= link_to t('practice.back_to_quiz_menu'), quiz_path, class: "bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
     </div>
   </div>
 <% end %>

@@ -1,7 +1,7 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
   <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-8 mb-8">
-    <h1 class="text-4xl font-bold mb-2">Exam History</h1>
-    <p class="text-xl opacity-90">Track your exam progress and performance</p>
+    <h1 class="text-4xl font-bold mb-2"><%= t('exam.exam_history') %></h1>
+    <p class="text-xl opacity-90"><%= t('exam.history_description') %></p>
   </div>
 
   <!-- Statistics Overview -->
@@ -10,7 +10,7 @@
       <div class="flex items-center">
         <div class="text-3xl mr-4">📊</div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Total Exams</h3>
+          <h3 class="text-lg font-semibold text-gray-800"><%= t('exam.total_exams') %></h3>
           <p class="text-3xl font-bold text-blue-600"><%= @stats[:total_exams] %></p>
         </div>
       </div>
@@ -20,7 +20,7 @@
       <div class="flex items-center">
         <div class="text-3xl mr-4">📈</div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Average Score</h3>
+          <h3 class="text-lg font-semibold text-gray-800"><%= t('exam.average_score') %></h3>
           <p class="text-3xl font-bold text-green-600"><%= @stats[:average_score] %>%</p>
         </div>
       </div>
@@ -30,7 +30,7 @@
       <div class="flex items-center">
         <div class="text-3xl mr-4">🏆</div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Best Score</h3>
+          <h3 class="text-lg font-semibold text-gray-800"><%= t('exam.best_score') %></h3>
           <p class="text-3xl font-bold text-yellow-600"><%= @stats[:best_score] %>%</p>
         </div>
       </div>
@@ -40,9 +40,9 @@
       <div class="flex items-center">
         <div class="text-3xl mr-4">⭐</div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Performance</h3>
+          <h3 class="text-lg font-semibold text-gray-800"><%= t('exam.performance') %></h3>
           <p class="text-2xl font-bold <%= @stats[:average_score] >= 90 ? 'text-green-600' : @stats[:average_score] >= 70 ? 'text-yellow-600' : 'text-red-600' %>">
-            <%= @stats[:average_score] >= 90 ? 'Excellent' : @stats[:average_score] >= 70 ? 'Good' : 'Needs Practice' %>
+            <%= @stats[:average_score] >= 90 ? t('exam.excellent') : @stats[:average_score] >= 70 ? t('exam.good') : t('exam.needs_practice') %>
           </p>
         </div>
       </div>
@@ -52,13 +52,13 @@
   <!-- Breakdown by Level and Mode -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
     <div class="bg-white rounded-xl shadow-lg p-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-6">Exams by Level</h3>
+      <h3 class="text-2xl font-bold text-gray-800 mb-6"><%= t('exam.exams_by_level') %></h3>
       <div class="space-y-4">
         <% %w[N5 N4 N3].each do |level| %>
           <div class="flex justify-between items-center">
             <span class="text-gray-600 font-medium"><%= level %>:</span>
             <span class="font-bold <%= level == 'N5' ? 'text-green-600' : level == 'N4' ? 'text-yellow-600' : 'text-red-600' %>">
-              <%= @stats[:exams_by_level][level] || 0 %> exams
+              <%= @stats[:exams_by_level][level] || 0 %> <%= t('exam.exams').downcase %>
             </span>
           </div>
         <% end %>
@@ -66,19 +66,19 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-lg p-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-6">Exams by Mode</h3>
+      <h3 class="text-2xl font-bold text-gray-800 mb-6"><%= t('exam.exams_by_mode') %></h3>
       <div class="space-y-4">
         <div class="flex justify-between items-center">
-          <span class="text-gray-600 font-medium">Casual:</span>
-          <span class="font-bold text-green-600"><%= @stats[:exams_by_mode]['casual'] || 0 %> exams</span>
+          <span class="text-gray-600 font-medium"><%= t('exam.modes.casual.name') %>:</span>
+          <span class="font-bold text-green-600"><%= @stats[:exams_by_mode]['casual'] || 0 %> <%= t('exam.exams').downcase %></span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-600 font-medium">Ambitious:</span>
-          <span class="font-bold text-yellow-600"><%= @stats[:exams_by_mode]['ambitious'] || 0 %> exams</span>
+          <span class="text-gray-600 font-medium"><%= t('exam.modes.ambitious.name') %>:</span>
+          <span class="font-bold text-yellow-600"><%= @stats[:exams_by_mode]['ambitious'] || 0 %> <%= t('exam.exams').downcase %></span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-600 font-medium">Dedicated:</span>
-          <span class="font-bold text-red-600"><%= @stats[:exams_by_mode]['dedicated'] || 0 %> exams</span>
+          <span class="text-gray-600 font-medium"><%= t('exam.modes.dedicated.name') %>:</span>
+          <span class="font-bold text-red-600"><%= @stats[:exams_by_mode]['dedicated'] || 0 %> <%= t('exam.exams').downcase %></span>
         </div>
       </div>
     </div>
@@ -86,19 +86,19 @@
 
   <!-- Exam History Table -->
   <div class="bg-white rounded-xl shadow-lg p-6">
-    <h3 class="text-2xl font-bold text-gray-800 mb-6">Recent Exams</h3>
+    <h3 class="text-2xl font-bold text-gray-800 mb-6"><%= t('exam.recent_exams') %></h3>
     <% if @exam_attempts.any? %>
       <div class="overflow-x-auto">
         <table class="w-full table-auto">
           <thead>
             <tr class="border-b border-gray-200">
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Level</th>
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Mode</th>
-              <th class="text-center py-3 px-4 font-semibold text-gray-700">Score</th>
-              <th class="text-center py-3 px-4 font-semibold text-gray-700">Duration</th>
-              <th class="text-center py-3 px-4 font-semibold text-gray-700">Correct/Total</th>
-              <th class="text-center py-3 px-4 font-semibold text-gray-700">Action</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700"><%= t('exam.date') %></th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700"><%= t('exam.level') %></th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700"><%= t('exam.mode') %></th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700"><%= t('exam.score') %></th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700"><%= t('exam.duration') %></th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700"><%= t('common.correct') %>/<%= t('common.total') %></th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700"><%= t('exam.action') %></th>
             </tr>
           </thead>
           <tbody>
@@ -119,7 +119,7 @@
                 </td>
                 <td class="py-4 px-4">
                   <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full <%= exam.exam_mode == 'casual' ? 'bg-green-100 text-green-800' : exam.exam_mode == 'ambitious' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800' %>">
-                    <%= exam.exam_mode.capitalize %>
+                    <%= t("exam.modes.#{exam.exam_mode}.name") %>
                   </span>
                 </td>
                 <td class="py-4 px-4 text-center">
@@ -129,7 +129,7 @@
                 </td>
                 <td class="py-4 px-4 text-center">
                   <span class="text-sm text-gray-600">
-                    <%= exam.duration_minutes %> min
+                    <%= exam.duration_minutes %> <%= t('time.minutes').downcase %>
                   </span>
                 </td>
                 <td class="py-4 px-4 text-center">
@@ -138,7 +138,7 @@
                   </span>
                 </td>
                 <td class="py-4 px-4 text-center">
-                  <%= link_to "View Details", exam_result_path(exam), 
+                  <%= link_to t('common.view_details'), exam_result_path(exam), 
                       class: "bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" %>
                 </td>
               </tr>
@@ -149,15 +149,15 @@
     <% else %>
       <div class="text-center py-12">
         <div class="text-6xl mb-4">📝</div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Exams Yet</h3>
-        <p class="text-gray-600 mb-6">Start taking exams to see your history here!</p>
-        <%= link_to "Start Exam", exam_path, class: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2"><%= t('exam.no_exams_yet') %></h3>
+        <p class="text-gray-600 mb-6"><%= t('exam.start_exams_message') %></p>
+        <%= link_to t('exam.start_exam_button'), exam_path, class: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
       </div>
     <% end %>
   </div>
 
   <!-- Back to Exam -->
   <div class="text-center mt-8">
-    <%= link_to "← Back to Exams", exam_path, class: "bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium" %>
+    <%= link_to t('exam.back_to_exams'), exam_path, class: "bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium" %>
   </div>
 </div>

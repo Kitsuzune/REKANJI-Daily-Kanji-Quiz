@@ -2,8 +2,8 @@
   <div class="max-w-4xl mx-auto px-4">
     <!-- Header -->
     <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-8 mb-8 text-center">
-      <h1 class="text-4xl font-bold mb-4">Exam Complete!</h1>
-      <p class="text-xl opacity-90">Here are your results</p>
+      <h1 class="text-4xl font-bold mb-4"><%= t('exam.exam_complete') %></h1>
+      <p class="text-xl opacity-90"><%= t('exam.your_results') %></p>
     </div>
 
     <!-- Score Card -->
@@ -16,7 +16,7 @@
           <%= score_status(@exam_attempt.score) %>
         </div>
         <div class="text-lg text-gray-600">
-          <%= @exam_attempt.correct_answers %> out of <%= @exam_attempt.total_questions %> questions correct
+          <%= @exam_attempt.correct_answers %> <%= t('common.out_of') %> <%= @exam_attempt.total_questions %> <%= t('exam.questions_correct') %>
         </div>
       </div>
       
@@ -24,15 +24,15 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-green-50 rounded-lg p-4">
           <div class="text-2xl font-bold text-green-600"><%= @exam_attempt.correct_answers %></div>
-          <div class="text-sm text-green-700">Correct</div>
+          <div class="text-sm text-green-700"><%= t('exam.correct_answers') %></div>
         </div>
         <div class="bg-red-50 rounded-lg p-4">
           <div class="text-2xl font-bold text-red-600"><%= @exam_attempt.total_questions - @exam_attempt.correct_answers %></div>
-          <div class="text-sm text-red-700">Incorrect</div>
+          <div class="text-sm text-red-700"><%= t('exam.incorrect_answers') %></div>
         </div>
         <div class="bg-blue-50 rounded-lg p-4">
           <div class="text-2xl font-bold text-blue-600"><%= time_taken(@exam_attempt) %></div>
-          <div class="text-sm text-blue-700">Time Taken</div>
+          <div class="text-sm text-blue-700"><%= t('exam.time_taken') %></div>
         </div>
       </div>
 
@@ -53,7 +53,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
           </svg>
         </span>
-        Question Review
+        <%= t('exam.question_review') %>
       </h2>
       
       <div class="space-y-6">
@@ -62,18 +62,18 @@
             <!-- Question Header -->
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center">
-                <span class="text-lg font-semibold text-gray-700 mr-3">Question <%= index + 1 %></span>
+                <span class="text-lg font-semibold text-gray-700 mr-3"><%= t('exam.question') %> <%= index + 1 %></span>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= answer.is_correct? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
                   <% if answer.is_correct? %>
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
-                    Correct
+                    <%= t('common.correct') %>
                   <% else %>
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                     </svg>
-                    Incorrect
+                    <%= t('exam.incorrect') %>
                   <% end %>
                 </span>
               </div>
@@ -86,19 +86,19 @@
               <% when 'kanji_to_meaning' %>
                 <div class="text-center mb-4">
                   <div class="text-4xl font-bold text-gray-800 mb-2 kanji-character"><%= answer.kanji.kanji %></div>
-                  <p class="text-gray-600">What does this kanji mean?</p>
+                  <p class="text-gray-600"><%= t('exam.question_types.what_meaning') %></p>
                 </div>
               <% when 'kanji_to_reading' %>
                 <div class="text-center mb-4">
                   <div class="text-4xl font-bold text-gray-800 mb-2 kanji-character"><%= answer.kanji.kanji %></div>
-                  <p class="text-gray-600">How do you read this kanji?</p>
+                  <p class="text-gray-600"><%= t('exam.question_types.how_read') %></p>
                 </div>
               <% when 'meaning_to_kanji' %>
                 <div class="text-center mb-4">
                   <div class="bg-blue-100 rounded-lg p-4 mb-2">
-                    <div class="text-xl font-bold text-blue-800"><%= answer.kanji.meaning_id %></div>
+                    <div class="text-xl font-bold text-blue-800"><%= kanji_meaning(answer.kanji) %></div>
                   </div>
-                  <p class="text-gray-600">Which kanji has this meaning?</p>
+                  <p class="text-gray-600"><%= t('exam.question_types.which_kanji_meaning') %></p>
                 </div>
               <% when 'reading_to_kanji' %>
                 <div class="text-center mb-4">
@@ -106,13 +106,13 @@
                     <% if answer.kanji.respond_to?(:onyomi) && answer.kanji.respond_to?(:kunyomi) %>
                       <% if answer.kanji.onyomi.present? && !answer.kanji.onyomi.include?('-') %>
                         <div class="mb-1">
-                          <span class="text-sm text-gray-600">Onyomi:</span> 
+                          <span class="text-sm text-gray-600"><%= t('learn.onyomi') %>:</span> 
                           <span class="text-lg font-bold text-purple-700"><%= answer.kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                         </div>
                       <% end %>
                       <% if answer.kanji.kunyomi.present? && !answer.kanji.kunyomi.include?('-') %>
                         <div>
-                          <span class="text-sm text-gray-600">Kunyomi:</span> 
+                          <span class="text-sm text-gray-600"><%= t('learn.kunyomi') %>:</span> 
                           <span class="text-lg font-bold text-purple-700"><%= answer.kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                         </div>
                       <% end %>
@@ -120,7 +120,7 @@
                       <div class="text-lg font-bold text-purple-700"><%= answer.kanji.reading %></div>
                     <% end %>
                   </div>
-                  <p class="text-gray-600">Which kanji has this reading?</p>
+                  <p class="text-gray-600"><%= t('exam.question_types.which_kanji_reading') %></p>
                 </div>
               <% end %>
             </div>
@@ -128,7 +128,7 @@
             <!-- Answer Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div class="bg-white rounded-lg p-4 border-l-4 border-blue-400">
-                <h4 class="font-semibold text-blue-700 mb-2">Your Answer:</h4>
+                <h4 class="font-semibold text-blue-700 mb-2"><%= t('exam.answer_sections.your_answer') %></h4>
                 <div class="text-gray-800">
                   <% case answer.question_type %>
                   <% when 'kanji_to_reading' %>
@@ -137,39 +137,39 @@
                       <% if user_kanji %>
                         <% if user_kanji.respond_to?(:onyomi) && user_kanji.respond_to?(:kunyomi) %>
                           <% if user_kanji.onyomi.present? && !user_kanji.onyomi.include?('-') %>
-                            <div class="text-sm"><span class="font-medium">Onyomi:</span> <%= user_kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
+                            <div class="text-sm"><span class="font-medium"><%= t('learn.onyomi') %>:</span> <%= user_kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
                           <% end %>
                           <% if user_kanji.kunyomi.present? && !user_kanji.kunyomi.include?('-') %>
-                            <div class="text-sm"><span class="font-medium">Kunyomi:</span> <%= user_kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
+                            <div class="text-sm"><span class="font-medium"><%= t('learn.kunyomi') %>:</span> <%= user_kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
                           <% end %>
                         <% else %>
                           <%= user_kanji.reading %>
                         <% end %>
                       <% else %>
-                        <span class="text-gray-500 italic">Invalid answer</span>
+                        <span class="text-gray-500 italic"><%= t('exam.answer_sections.invalid_answer') %></span>
                       <% end %>
                     <% else %>
-                      <span class="text-gray-500 italic">No answer selected</span>
+                      <span class="text-gray-500 italic"><%= t('exam.answer_sections.no_answer') %></span>
                     <% end %>
                   <% else %>
-                    <%= answer.user_answer.present? ? answer.user_answer : content_tag(:span, "No answer selected", class: "text-gray-500 italic") %>
+                    <%= answer.user_answer.present? ? answer.user_answer : content_tag(:span, t('exam.answer_sections.no_answer'), class: "text-gray-500 italic") %>
                   <% end %>
                 </div>
               </div>
 
               <div class="bg-white rounded-lg p-4 border-l-4 border-green-400">
-                <h4 class="font-semibold text-green-700 mb-2">Correct Answer:</h4>
+                <h4 class="font-semibold text-green-700 mb-2"><%= t('exam.answer_sections.correct_answer') %></h4>
                 <div class="text-gray-800">
                   <% case answer.question_type %>
                   <% when 'kanji_to_meaning' %>
-                    <%= answer.kanji.meaning_id %>
+                    <%= kanji_meaning(answer.kanji) %>
                   <% when 'kanji_to_reading' %>
                     <% if answer.kanji.respond_to?(:onyomi) && answer.kanji.respond_to?(:kunyomi) %>
                       <% if answer.kanji.onyomi.present? && !answer.kanji.onyomi.include?('-') %>
-                        <div class="text-sm"><span class="font-medium">Onyomi:</span> <%= answer.kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
+                        <div class="text-sm"><span class="font-medium"><%= t('learn.onyomi') %>:</span> <%= answer.kanji.onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
                       <% end %>
                       <% if answer.kanji.kunyomi.present? && !answer.kanji.kunyomi.include?('-') %>
-                        <div class="text-sm"><span class="font-medium">Kunyomi:</span> <%= answer.kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
+                        <div class="text-sm"><span class="font-medium"><%= t('learn.kunyomi') %>:</span> <%= answer.kanji.kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></div>
                       <% end %>
                     <% else %>
                       <%= answer.kanji.reading %>
@@ -189,28 +189,28 @@
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                   </svg>
                   <div>
-                    <h5 class="font-semibold text-red-800 mb-1">Learning Note</h5>
+                    <h5 class="font-semibold text-red-800 mb-1"><%= t('exam.learning_note') %></h5>
                     <p class="text-red-700 text-sm">
                       <% case answer.question_type %>
                       <% when 'kanji_to_meaning' %>
-                        The kanji <strong><%= answer.kanji.kanji %></strong> means "<strong><%= answer.kanji.meaning_id %></strong>". 
-                        <% if answer.kanji.respond_to?(:description) && answer.kanji.description.present? %>
-                          <br><em><%= answer.kanji.description %></em>
+                        <%= t('exam.learning_notes.kanji_meaning', kanji: answer.kanji.kanji, meaning: kanji_meaning(answer.kanji)) %>
+                        <% if answer.kanji.respond_to?(:description) && kanji_description(answer.kanji).present? %>
+                          <br><em><%= kanji_description(answer.kanji) %></em>
                         <% end %>
                       <% when 'kanji_to_reading' %>
-                        The kanji <strong><%= answer.kanji.kanji %></strong> is read as shown above.
-                        <% if answer.kanji.respond_to?(:description) && answer.kanji.description.present? %>
-                          <br><em><%= answer.kanji.description %></em>
+                        <%= t('exam.learning_notes.kanji_reading', kanji: answer.kanji.kanji) %>
+                        <% if answer.kanji.respond_to?(:description) && kanji_description(answer.kanji).present? %>
+                          <br><em><%= kanji_description(answer.kanji) %></em>
                         <% end %>
                       <% when 'meaning_to_kanji' %>
-                        The meaning "<strong><%= answer.kanji.meaning_id %></strong>" corresponds to the kanji <strong><%= answer.kanji.kanji %></strong>.
-                        <% if answer.kanji.respond_to?(:description) && answer.kanji.description.present? %>
-                          <br><em><%= answer.kanji.description %></em>
+                        <%= t('exam.learning_notes.meaning_kanji', meaning: kanji_meaning(answer.kanji), kanji: answer.kanji.kanji) %>
+                        <% if answer.kanji.respond_to?(:description) && kanji_description(answer.kanji).present? %>
+                          <br><em><%= kanji_description(answer.kanji) %></em>
                         <% end %>
                       <% when 'reading_to_kanji' %>
-                        This reading corresponds to the kanji <strong><%= answer.kanji.kanji %></strong> which means "<strong><%= answer.kanji.meaning_id %></strong>".
-                        <% if answer.kanji.respond_to?(:description) && answer.kanji.description.present? %>
-                          <br><em><%= answer.kanji.description %></em>
+                        <%= t('exam.learning_notes.reading_kanji', kanji: answer.kanji.kanji, meaning: kanji_meaning(answer.kanji)) %>
+                        <% if answer.kanji.respond_to?(:description) && kanji_description(answer.kanji).present? %>
+                          <br><em><%= kanji_description(answer.kanji) %></em>
                         <% end %>
                       <% end %>
                     </p>
@@ -225,10 +225,10 @@
 
     <!-- Action Buttons -->
     <div class="text-center space-y-4">
-      <%= link_to "Take Another Exam", exam_path, 
+      <%= link_to t('exam.take_another'), exam_path, 
           class: "inline-block bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium mr-4" %>
       
-      <%= link_to "Back to Home", root_path, 
+      <%= link_to t('common.back_to_home'), root_path, 
           class: "inline-block bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium" %>
     </div>
   </div>

@@ -2,7 +2,7 @@
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Back Button -->
     <div class="mb-6">
-      <%= link_to "← Back to Learn", learn_path(level: @kanji.rate, type: @kanji_type), 
+      <%= link_to "← #{t('learn.back_to_list')}", learn_path(level: @kanji.rate, type: @kanji_type), 
           class: "inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
     </div>
 
@@ -19,7 +19,7 @@
                 <%= @kanji.rate %>
               </span>
               <span class="inline-flex px-4 py-2 text-lg font-medium rounded-full bg-yellow-100 text-yellow-600 bg-opacity-20 capitalize">
-                <%= @kanji_type %> Kanji
+                <%= @kanji_type == 'single' ? t('learn.single_kanji') : t('learn.multiple_kanji') %>
               </span>
             </div>
           </div>
@@ -28,57 +28,57 @@
           <div class="p-8">
             <!-- Meaning -->
             <div class="mb-6">
-              <h3 class="text-2xl font-bold text-gray-800 mb-3">Meaning</h3>
-              <p class="text-xl text-gray-700"><%= @kanji.meaning_id %></p>
+              <h3 class="text-2xl font-bold text-gray-800 mb-3"><%= t('learn.meaning') %></h3>
+              <p class="text-xl text-gray-700"><%= kanji_meaning(@kanji) %></p>
             </div>
             
             <!-- Readings -->
             <div class="mb-6">
               <h3 class="text-2xl font-bold text-gray-800 mb-3">
-                <%= @kanji_type == 'single' ? 'Readings' : 'Reading' %>
+                <%= @kanji_type == 'single' ? t('learn.reading') + 's' : t('learn.reading') %>
               </h3>
               <% if @kanji_type == 'single' %>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <% if @kanji.onyomi.present? %>
                     <div class="bg-blue-50 rounded-lg p-4">
-                      <h4 class="text-lg font-semibold text-blue-800 mb-2">Onyomi (音読み)</h4>
+                      <h4 class="text-lg font-semibold text-blue-800 mb-2"><%= t('learn.onyomi') %> (音読み)</h4>
                       <p class="text-blue-700 text-xl"><%= @kanji.onyomi %></p>
-                      <p class="text-sm text-blue-600 mt-1">Chinese reading</p>
+                      <p class="text-sm text-blue-600 mt-1"><%= t('learn.chinese_reading') %></p>
                     </div>
                   <% end %>
                   <% if @kanji.kunyomi.present? %>
                     <div class="bg-green-50 rounded-lg p-4">
-                      <h4 class="text-lg font-semibold text-green-800 mb-2">Kunyomi (訓読み)</h4>
+                      <h4 class="text-lg font-semibold text-green-800 mb-2"><%= t('learn.kunyomi') %> (訓読み)</h4>
                       <p class="text-green-700 text-xl"><%= @kanji.kunyomi %></p>
-                      <p class="text-sm text-green-600 mt-1">Japanese reading</p>
+                      <p class="text-sm text-green-600 mt-1"><%= t('learn.japanese_reading') %></p>
                     </div>
                   <% end %>
                 </div>
               <% else %>
                 <div class="bg-purple-50 rounded-lg p-4">
                   <p class="text-purple-700 text-xl"><%= @kanji.reading %></p>
-                  <p class="text-sm text-purple-600 mt-1">Compound reading</p>
+                  <p class="text-sm text-purple-600 mt-1"><%= t('learn.compound_reading') %></p>
                 </div>
               <% end %>
             </div>
             
             <!-- Description -->
-            <% if @kanji.description_id.present? %>
+            <% if kanji_description(@kanji).present? %>
               <div class="mb-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Description</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3"><%= t('learn.learn_desc') %></h3>
                 <div class="bg-gray-50 rounded-lg p-6">
-                  <p class="text-gray-700 leading-relaxed"><%= @kanji.description_id %></p>
+                  <p class="text-gray-700 leading-relaxed"><%= kanji_description(@kanji) %></p>
                 </div>
               </div>
             <% end %>
             
             <!-- Practice Buttons -->
             <div class="border-t pt-6">
-              <h3 class="text-lg font-semibold text-gray-800 mb-4">Practice This Kanji</h3>
+              <h3 class="text-lg font-semibold text-gray-800 mb-4"><%= t('learn.practice_this_kanji') %></h3>
               <div class="flex space-x-4">
-                <%= link_to "Practice Single", quiz_single_path(@kanji.rate), 
+                <%= link_to t('practice.single_practice'), quiz_single_path(@kanji.rate), 
                     class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
-                <%= link_to "Practice Multiple", quiz_multiple_path(@kanji.rate), 
+                <%= link_to t('practice.multiple_practice'), quiz_multiple_path(@kanji.rate), 
                     class: "px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium" %>
               </div>
             </div>
@@ -91,18 +91,18 @@
         <!-- User Progress (if logged in) -->
         <% if user_signed_in? && @user_stats %>
           <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Your Progress</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><%= t('home.your_progress') %></h3>
             <div class="space-y-4">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Attempts:</span>
+                <span class="text-gray-600"><%= t('ui.attempts') %>:</span>
                 <span class="font-bold text-blue-600"><%= @user_stats[:total_attempts] %></span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Correct:</span>
+                <span class="text-gray-600"><%= t('common.correct') %>:</span>
                 <span class="font-bold text-green-600"><%= @user_stats[:correct_attempts] %></span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Accuracy:</span>
+                <span class="text-gray-600"><%= t('ui.accuracy') %>:</span>
                 <span class="font-bold text-purple-600"><%= @user_stats[:accuracy] %>%</span>
               </div>
             </div>
@@ -119,13 +119,13 @@
             <!-- Recent Attempts -->
             <% if @user_attempts.any? %>
               <div class="mt-6 pt-6 border-t">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">Recent Attempts</h4>
+                <h4 class="text-lg font-semibold text-gray-800 mb-3"><%= t('learn.recent_attempts') %></h4>
                 <div class="space-y-2">
                   <% @user_attempts.each do |attempt| %>
                     <div class="flex items-center justify-between text-sm">
-                      <span class="text-gray-600"><%= time_ago_in_words(attempt.answered_at) %> ago</span>
+                      <span class="text-gray-600"><%= time_ago_with_locale(attempt.answered_at) %></span>
                       <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium <%= attempt.correct? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
-                        <%= attempt.correct? ? 'Correct' : 'Wrong' %>
+                        <%= attempt.correct? ? t('common.correct') : t('learn.wrong') %>
                       </span>
                     </div>
                   <% end %>
@@ -138,13 +138,13 @@
         <!-- Similar Kanji -->
         <% if @similar_kanjis.any? %>
           <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Similar <%= @kanji.rate %> Kanji</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><%= t('learn.similar_kanji', level: @kanji.rate) %></h3>
             <div class="grid grid-cols-2 gap-3">
               <% @similar_kanjis.each do |similar_kanji| %>
                 <%= link_to learn_show_path(@kanji_type, similar_kanji.id), 
                     class: "block bg-gray-50 hover:bg-gray-100 rounded-lg p-4 text-center transition-colors" do %>
                   <div class="text-3xl font-bold text-gray-800 mb-2"><%= similar_kanji.kanji %></div>
-                  <div class="text-xs text-gray-600"><%= truncate(similar_kanji.meaning_id, length: 20) %></div>
+                  <div class="text-xs text-gray-600"><%= truncate(kanji_meaning(similar_kanji), length: 20) %></div>
                 <% end %>
               <% end %>
             </div>
@@ -153,13 +153,13 @@
         
         <!-- Quick Actions -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+          <h3 class="text-xl font-bold text-gray-800 mb-4"><%= t('learn.quick_actions') %></h3>
           <div class="space-y-3">
-            <%= link_to "Browse All #{@kanji.rate}", learn_path(level: @kanji.rate, type: @kanji_type), 
+            <%= link_to t('learn.browse_all_level', level: @kanji.rate), learn_path(level: @kanji.rate, type: @kanji_type), 
                 class: "block w-full bg-gray-600 text-white text-center py-2 rounded-lg hover:bg-gray-700 transition-colors" %>
-            <%= link_to "Take #{@kanji.rate} Exam", exam_path, 
+            <%= link_to t('learn.take_level_exam', level: @kanji.rate), exam_path, 
                 class: "block w-full bg-indigo-600 text-white text-center py-2 rounded-lg hover:bg-indigo-700 transition-colors" %>
-            <%= link_to "Random Quiz", quiz_path, 
+            <%= link_to t('learn.random_quiz'), quiz_path, 
                 class: "block w-full bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 transition-colors" %>
           </div>
         </div>

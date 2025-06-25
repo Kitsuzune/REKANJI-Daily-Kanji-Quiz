@@ -1,12 +1,12 @@
 <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl p-8 mb-8 text-center">
-  <h1 class="text-4xl md:text-5xl font-bold mb-4">📝 Kanji Exam Center</h1>
-  <p class="text-xl opacity-90">Test your kanji knowledge with comprehensive exams</p>
+  <h1 class="text-4xl md:text-5xl font-bold mb-4">📝 <%= t('exam.title') %></h1>
+  <p class="text-xl opacity-90"><%= t('exam.description') %></p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
   <!-- Exam Cards -->
   <div class="lg:col-span-3">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">Choose Your Level</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-6"><%= t('exam.choose_level') %></h2>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <% @levels.each do |level| %>
@@ -15,16 +15,16 @@
             <div class="text-4xl font-bold mb-2 <%= level == 'N5' ? 'text-green-600' : level == 'N4' ? 'text-yellow-600' : 'text-red-600' %>">
               <%= level %>
             </div>
-            <h3 class="text-xl font-semibold text-gray-800">JLPT <%= level %></h3>
+            <h3 class="text-xl font-semibold text-gray-800"><%= t('home.jlpt_level', level: level) %></h3>
             <p class="text-gray-600 text-sm mt-2">
-              <%= level == 'N5' ? 'Beginner Level' : level == 'N4' ? 'Elementary Level' : 'Intermediate Level' %>
+              <%= level == 'N5' ? t('levels.beginner') + ' Level' : level == 'N4' ? t('levels.elementary') + ' Level' : t('levels.intermediate') + ' Level' %>
             </p>
           </div>
           
           <div class="space-y-3">
             <button onclick="openExamModal('<%= level %>')" 
                     class="w-full bg-gradient-to-r <%= level == 'N5' ? 'from-green-500 to-green-600' : level == 'N4' ? 'from-yellow-500 to-yellow-600' : 'from-red-500 to-red-600' %> text-white py-3 rounded-lg hover:opacity-90 transition-opacity font-medium">
-              Start <%= level %> Exam
+              <%= t('exam.start_level_exam', level: level) %>
             </button>
           </div>
         </div>
@@ -35,18 +35,18 @@
   <!-- Sidebar -->
   <div>
     <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Your Stats</h3>
+      <h3 class="text-xl font-bold text-gray-800 mb-4">📊 <%= t('exam.your_stats') %></h3>
       <div class="space-y-3">
         <div class="flex justify-between">
-          <span class="text-gray-600">Total Exams:</span>
+          <span class="text-gray-600"><%= t('exam.total_exams') %>:</span>
           <span class="font-bold text-blue-600"><%= current_user.exam_attempts.completed.count %></span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">Average Score:</span>
+          <span class="text-gray-600"><%= t('exam.average_score') %>:</span>
           <span class="font-bold text-purple-600"><%= (current_user.exam_attempts.completed.average(:score) || 0).round(1) %>%</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">Best Score:</span>
+          <span class="text-gray-600"><%= t('exam.best_score') %>:</span>
           <span class="font-bold text-green-600"><%= (current_user.exam_attempts.completed.maximum(:score) || 0).round(1) %>%</span>
         </div>
       </div>
@@ -54,9 +54,9 @@
     
     <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
       <div class="text-4xl mb-4">📚</div>
-      <h3 class="text-lg font-semibold text-blue-800 mb-2">Exam History</h3>
-      <p class="text-blue-600 text-sm mb-4">View your past exam results and track your progress</p>
-      <%= link_to "View History", exam_history_path, class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
+      <h3 class="text-lg font-semibold text-blue-800 mb-2"><%= t('exam.exam_history') %></h3>
+      <p class="text-blue-600 text-sm mb-4"><%= t('exam.history_description') %></p>
+      <%= link_to t('exam.view_history'), exam_history_path, class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" %>
     </div>
   </div>
 </div>
@@ -67,7 +67,7 @@
     <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
     <div class="p-6 border-b border-gray-200">
       <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-800" id="modalTitle">Choose Exam Mode</h2>
+        <h2 class="text-2xl font-bold text-gray-800" id="modalTitle"><%= t('exam.choose_exam_mode') %></h2>
         <button onclick="closeExamModal()" class="text-gray-500 hover:text-gray-700">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -82,22 +82,23 @@
         <div class="border-2 border-green-300 rounded-xl p-6 hover:shadow-lg transition-shadow">
           <div class="text-center mb-4">
             <div class="text-4xl font-bold mb-2">楽</div>
-            <h3 class="text-xl font-semibold text-green-600">Casual</h3>
+            <h3 class="text-xl font-semibold text-green-600"><%= t('exam.modes.casual.name') %></h3>
           </div>
           
           <div class="bg-green-50 rounded-lg p-4 mb-4">
-            <p class="text-sm text-gray-700 mb-3">Diperuntukan untuk fast paced learning dengan bantuan arti dan cara baca kanji</p>
+            <p class="text-sm text-gray-700 mb-3"><%= t('exam.modes.casual.description') %></p>
             <ul class="text-sm space-y-1">
-              <li>• 12 soal</li>
-              <li>• 25 menit</li>
-              <li>• Arti kanji dimunculkan di soal</li>
-              <li>• Cara baca dimunculkan di soal</li>
+              <li>• <%= t('exam.modes.casual.questions') %></li>
+              <li>• <%= t('exam.modes.casual.time') %></li>
+              <% t('exam.modes.casual.features').each do |feature| %>
+                <li>• <%= feature %></li>
+              <% end %>
             </ul>
           </div>
           
           <button onclick="startExam('casual')" 
                   class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
-            Start Casual
+            <%= t('exam.start_casual') %>
           </button>
         </div>
 
@@ -105,22 +106,23 @@
         <div class="border-2 border-orange-300 rounded-xl p-6 hover:shadow-lg transition-shadow">
           <div class="text-center mb-4">
             <div class="text-4xl font-bold mb-2">挑</div>
-            <h3 class="text-xl font-semibold text-orange-600">Ambitious</h3>
+            <h3 class="text-xl font-semibold text-orange-600"><%= t('exam.modes.ambitious.name') %></h3>
           </div>
           
           <div class="bg-orange-50 rounded-lg p-4 mb-4">
-            <p class="text-sm text-gray-700 mb-3">Diperuntukan untuk yang mengetes pengetahuan lebih dalam tanpa bantuan arti kanji</p>
+            <p class="text-sm text-gray-700 mb-3"><%= t('exam.modes.ambitious.description') %></p>
             <ul class="text-sm space-y-1">
-              <li>• 30 soal</li>
-              <li>• 45 menit</li>
-              <li>• Arti kanji tidak dimunculkan di soal</li>
-              <li>• Cara baca dimunculkan di soal</li>
+              <li>• <%= t('exam.modes.ambitious.questions') %></li>
+              <li>• <%= t('exam.modes.ambitious.time') %></li>
+              <% t('exam.modes.ambitious.features').each do |feature| %>
+                <li>• <%= feature %></li>
+              <% end %>
             </ul>
           </div>
           
           <button onclick="startExam('ambitious')" 
                   class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium">
-            Start Ambitious
+            <%= t('exam.start_ambitious') %>
           </button>
         </div>
 
@@ -128,22 +130,23 @@
         <div class="border-2 border-red-300 rounded-xl p-6 hover:shadow-lg transition-shadow">
           <div class="text-center mb-4">
             <div class="text-4xl font-bold mb-2">努</div>
-            <h3 class="text-xl font-semibold text-red-600">Dedicated</h3>
+            <h3 class="text-xl font-semibold text-red-600"><%= t('exam.modes.dedicated.name') %></h3>
           </div>
           
           <div class="bg-red-50 rounded-lg p-4 mb-4">
-            <p class="text-sm text-gray-700 mb-3">Diperuntukan untuk yang ingin menchallenge pengetahuannya dengan waktu yang fair</p>
+            <p class="text-sm text-gray-700 mb-3"><%= t('exam.modes.dedicated.description') %></p>
             <ul class="text-sm space-y-1">
-              <li>• 50 soal</li>
-              <li>• 60 menit</li>
-              <li>• Arti kanji tidak dimunculkan di soal</li>
-              <li>• Cara baca tidak dimunculkan di soal</li>
+              <li>• <%= t('exam.modes.dedicated.questions') %></li>
+              <li>• <%= t('exam.modes.dedicated.time') %></li>
+              <% t('exam.modes.dedicated.features').each do |feature| %>
+                <li>• <%= feature %></li>
+              <% end %>
             </ul>
           </div>
           
           <button onclick="startExam('dedicated')" 
                   class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium">
-            Start Dedicated
+            <%= t('exam.start_dedicated') %>
           </button>
         </div>
       </div>
@@ -156,7 +159,7 @@ let selectedLevel = '';
 
 function openExamModal(level) {
   selectedLevel = level;
-  document.getElementById('modalTitle').textContent = `Choose ${level} Exam Mode`;
+  document.getElementById('modalTitle').textContent = '<%= t('exam.choose_exam_mode') %>' + ' ' + level;
   document.getElementById('examModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }

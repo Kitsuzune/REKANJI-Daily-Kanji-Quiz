@@ -7,12 +7,12 @@
           <span class="inline-flex px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium <%= @exam_attempt.level == 'N5' ? 'bg-green-500' : @exam_attempt.level == 'N4' ? 'bg-yellow-500' : 'bg-red-500' %>">
             <%= @exam_attempt.level %>
           </span>
-          <span><%= @exam_attempt.exam_mode.capitalize %> Exam</span>
+          <span><%= t("exam.modes.#{@exam_attempt.exam_mode}.name") %> <%= t('nav.exam') %></span>
         </h4>
       </div>      <!-- Progress Bar -->
       <div class="bg-indigo-500 text-white px-4 py-3">
         <div class="flex justify-between items-center mb-2">
-          <span class="text-sm font-medium">Question <%= @current_question_number %> of <%= @total_questions %></span>
+          <span class="text-sm font-medium"><%= t('exam.question_of', current: @current_question_number, total: @total_questions) %></span>
           <span class="text-sm" id="timer">
             <span id="minutes">25</span>:<span id="seconds">00</span>
           </span>
@@ -22,10 +22,10 @@
                style="width: 0%"
                data-progress="<%= (@current_question_number.to_f / @total_questions * 100).round(2) %>">
           </div>
-        </div><!-- Progress Text -->
+        </div>        <!-- Progress Text -->
         <div class="text-center mt-2">
           <span class="text-xs text-white text-opacity-80 exam-progress-text" id="progress-text">
-            <%= (@current_question_number.to_f / @total_questions * 100).round(1) %>% Complete
+            <%= (@current_question_number.to_f / @total_questions * 100).round(1) %>% <%= t('ui.complete') %>
           </span>
         </div>
       </div>
@@ -37,38 +37,38 @@
           <% case @question[:type] %>
           <% when 'kanji_to_meaning' %>
             <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @question[:kanji].kanji %></div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">What does this kanji mean?</p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('exam.question_types.what_meaning') %></p>
             <% if @exam_attempt.exam_mode != 'dedicated' %>
-              <p class="text-base md:text-lg text-gray-500">Reading: <%= @question[:kanji].display_reading %></p>
+              <p class="text-base md:text-lg text-gray-500"><%= t('learn.reading') %>: <%= @question[:kanji].display_reading %></p>
             <% end %>
           
           <% when 'kanji_to_reading' %>
             <div class="text-6xl md:text-8xl font-bold text-gray-800 mb-3 md:mb-4 kanji-character"><%= @question[:kanji].kanji %></div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">How do you read this kanji?</p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('exam.question_types.how_read') %></p>
             <% if @exam_attempt.exam_mode == 'casual' %>
-              <p class="text-base md:text-lg text-gray-500">Meaning: <%= @question[:kanji].meaning_id %></p>
+              <p class="text-base md:text-lg text-gray-500"><%= t('learn.meaning') %>: <%= kanji_meaning(@question[:kanji]) %></p>
             <% end %>
           
           <% when 'meaning_to_kanji' %>
             <div class="bg-blue-50 rounded-xl p-6 md:p-8 mb-4">
-              <div class="text-2xl md:text-4xl font-bold text-blue-800 mb-2"><%= @question[:kanji].meaning_id %></div>
+              <div class="text-2xl md:text-4xl font-bold text-blue-800 mb-2"><%= kanji_meaning(@question[:kanji]) %></div>
             </div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this meaning?</p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('exam.question_types.which_kanji_meaning') %></p>
             <% if @exam_attempt.exam_mode != 'dedicated' %>
-              <p class="text-base md:text-lg text-gray-500">Reading: <%= @question[:kanji].display_reading %></p>
+              <p class="text-base md:text-lg text-gray-500"><%= t('learn.reading') %>: <%= @question[:kanji].display_reading %></p>
             <% end %>
             <% when 'reading_to_kanji' %>
             <div class="bg-purple-50 rounded-xl p-6 md:p-8 mb-4 text-center">
               <div class="text-lg md:text-xl font-semibold text-purple-800 mb-4">
                 <% if @question[:kanji].respond_to?(:onyomi) && @question[:kanji].onyomi.present? && !@question[:kanji].onyomi.include?('-') %>
                   <div class="mb-2">
-                    <span class="text-gray-600">Onyomi:</span> 
+                    <span class="text-gray-600"><%= t('learn.onyomi') %>:</span> 
                     <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @question[:kanji].onyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                   </div>
                 <% end %>
                 <% if @question[:kanji].respond_to?(:kunyomi) && @question[:kanji].kunyomi.present? && !@question[:kanji].kunyomi.include?('-') %>
                   <div>
-                    <span class="text-gray-600">Kunyomi:</span> 
+                    <span class="text-gray-600"><%= t('learn.kunyomi') %>:</span> 
                     <span class="text-2xl md:text-3xl font-bold text-purple-700"><%= @question[:kanji].kunyomi.gsub(/（[^）]*）/, '').gsub(/\([^)]*\)/, '').strip %></span>
                   </div>
                 <% end %>
@@ -77,9 +77,9 @@
                 <% end %>
               </div>
             </div>
-            <p class="text-lg md:text-2xl text-gray-700 mb-2">Which kanji has this reading?</p>
+            <p class="text-lg md:text-2xl text-gray-700 mb-2"><%= t('exam.question_types.which_kanji_reading') %></p>
             <% if @exam_attempt.exam_mode == 'casual' %>
-              <p class="text-base md:text-lg text-gray-500">Meaning: <%= @question[:kanji].meaning_id %></p>
+              <p class="text-base md:text-lg text-gray-500"><%= t('learn.meaning') %>: <%= kanji_meaning(@question[:kanji]) %></p>
             <% end %>
           <% end %>
         </div>
@@ -124,7 +124,7 @@
           
           <!-- Submit Button -->
           <div class="text-center">
-            <%= form.submit (@current_question_number == @total_questions ? "Finish Exam" : "Next Question"), 
+            <%= form.submit (@current_question_number == @total_questions ? t('exam.finish_exam') : t('practice.next_question')), 
                 class: "w-full md:w-auto px-8 py-3 md:py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-bold text-lg md:text-xl transform hover:scale-105 shadow-lg" %>
           </div>
         <% end %>
@@ -135,9 +135,9 @@
 <% else %>
   <div class="max-w-4xl mx-auto px-4">
     <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-      <h2 class="text-2xl font-bold text-red-600 mb-4">Invalid Question</h2>
-      <p class="text-gray-600 mb-6">There was an error loading this question.</p>
-      <%= link_to "Back to Exam List", exam_path, class: "bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium" %>
+      <h2 class="text-2xl font-bold text-red-600 mb-4"><%= t('exam.invalid_question') %></h2>
+      <p class="text-gray-600 mb-6"><%= t('exam.error_loading_question') %></p>
+      <%= link_to t('exam.back_to_exam_list'), exam_path, class: "bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium" %>
     </div>
   </div>
 <% end %>

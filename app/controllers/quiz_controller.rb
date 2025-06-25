@@ -73,7 +73,7 @@ class QuizController < ApplicationController
     # Determine correct answer based on question type
     correct_answer = case question_type
                     when 1 # Kanji -> Meaning
-                      kanji.meaning_id.strip
+                      get_kanji_meaning(kanji).strip
                     when 2 # Kanji -> Reading
                       if quiz_type == 'single'
                         # For reading questions, we compare kanji IDs
@@ -86,7 +86,7 @@ class QuizController < ApplicationController
                     when 4 # Reading -> Kanji
                       kanji.kanji.strip
                     else
-                      kanji.meaning_id.strip
+                      get_kanji_meaning(kanji).strip
                     end
     
     is_correct = selected_answer == correct_answer
@@ -127,7 +127,7 @@ class QuizController < ApplicationController
     
     session[:last_result] = {
       "kanji" => kanji.kanji,
-      "meaning" => kanji.meaning_id,
+      "meaning" => get_kanji_meaning(kanji),
       "reading" => quiz_type == 'single' ? kanji.display_reading : kanji.reading,
       "selected" => selected_display,
       "correct_answer" => correct_display,
@@ -135,7 +135,7 @@ class QuizController < ApplicationController
       "rate" => kanji.rate,
       "quiz_type" => quiz_type,
       "question_type" => question_type,
-      "description" => quiz_type == 'single' ? kanji.description_id : nil
+      "description" => quiz_type == 'single' ? get_kanji_description(kanji) : nil
     }
     
     redirect_to quiz_result_path
@@ -155,9 +155,9 @@ class QuizController < ApplicationController
   def generate_single_options(kanji, question_type = 1)
     case question_type
     when 1 # Kanji -> Meaning
-      correct_answer = kanji.meaning_id
+      correct_answer = get_kanji_meaning(kanji)
       wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
-      wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+      wrong_answers = wrong_kanjis.map { |k| get_kanji_meaning(k) }.uniq.reject { |answer| answer == correct_answer }
       
       # Take only 3 wrong answers and shuffle with correct answer
       final_wrong_answers = wrong_answers.take(3)
@@ -197,9 +197,9 @@ class QuizController < ApplicationController
       options = ([correct_answer] + final_wrong_answers).shuffle
       
     else
-      correct_answer = kanji.meaning_id
+      correct_answer = get_kanji_meaning(kanji)
       wrong_kanjis = get_random_wrong_kanjis(kanji, 6) # Get more to ensure uniqueness
-      wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+      wrong_answers = wrong_kanjis.map { |k| get_kanji_meaning(k) }.uniq.reject { |answer| answer == correct_answer }
       
       # Take only 3 wrong answers and shuffle with correct answer
       final_wrong_answers = wrong_answers.take(3)
@@ -232,7 +232,7 @@ class QuizController < ApplicationController
   end
   
   def generate_multiple_options(kanji)
-    correct_answer = kanji.meaning_id
+    correct_answer = get_kanji_meaning(kanji)
     
     # Get wrong options from the same rate
     wrong_kanjis = KanjiMultiple.by_rate(kanji.rate).where.not(id: kanji.id).random_sample(6) # Get more to ensure uniqueness
@@ -245,7 +245,7 @@ class QuizController < ApplicationController
       wrong_kanjis += additional_kanjis
     end
     
-    wrong_answers = wrong_kanjis.pluck(:meaning_id).uniq.reject { |answer| answer == correct_answer }
+    wrong_answers = wrong_kanjis.map { |k| get_kanji_meaning(k) }.uniq.reject { |answer| answer == correct_answer }
     
     # Take only 3 wrong answers and shuffle with correct answer
     final_wrong_answers = wrong_answers.take(3)
@@ -275,6 +275,25 @@ class QuizController < ApplicationController
       same_level_kanjis + other_level_kanjis
     else
       same_level_kanjis
+    end
+  end
+  
+  # Helper methods for bilingual content
+  def get_kanji_meaning(kanji)
+    if I18n.locale == :en && kanji.respond_to?(:meaning_en) && kanji.meaning_en.present?
+      kanji.meaning_en
+    else
+      kanji.meaning_id
+    end
+  end
+  
+  def get_kanji_description(kanji)
+    if I18n.locale == :en && kanji.respond_to?(:description_en) && kanji.description_en.present?
+      kanji.description_en
+    elsif kanji.respond_to?(:description_id) && kanji.description_id.present?
+      kanji.description_id
+    else
+      kanji.description
     end
   end
 end
